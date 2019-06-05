@@ -1,0 +1,22 @@
+package algo_0225;
+
+public class DFS {
+	public static void main(String[] args) {
+		dfs(new int[]{1, 2, 3}, new boolean[3], 0, "");
+	}
+	
+	static void dfs(int arr[], boolean[] visited, int k, String msg) {
+		if(k==arr.length) {
+			System.out.println(msg);
+			return;
+		}
+		
+		for(int i = 0; i < arr.length; i++) {
+			if(! visited[i]) {
+				visited[i] = true;
+				dfs(arr, visited, k+1, msg + arr[i]);
+				visited[i] = false;
+			}
+		}
+	}
+}
