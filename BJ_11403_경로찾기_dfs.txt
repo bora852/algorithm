@@ -1,0 +1,73 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+/**
+ * 백준 11403
+ * 경로찾기문제
+ * @author capsu
+ *
+ */
+public class Main {
+	
+	static int[][] ori_arr; 	//처음 입력받는 인접행렬
+	static int[][] ans_arr; 	//정점에서 방문할 수 있는 경로의 인접행렬
+	static boolean[] visited; 	//각 정점을 방문했는지 체크하는 방문행렬
+	static int N;				//정점개수 , 1 <= N <= 100
+	
+	public static void main(String[] args) throws IOException {
+//		Scanner sc = new Scanner(System.in);
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+//		N = sc.nextInt(); 
+		N = Integer.parseInt(br.readLine());
+		StringBuilder sb = new StringBuilder();
+		ori_arr = new int[N][N];
+		ans_arr = new int[N][N];
+		visited = new boolean[N];
+			
+		//배열에 넣는다.
+		for(int i = 0; i < N; i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			for(int j = 0; j < N; j++) {
+				ori_arr[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+		
+		
+		for(int i = 0; i < N; i++) {
+			dfs(i);
+			
+			for(int j = 0; j < N; j++) {
+				if(visited[j]) {
+					ans_arr[i][j] = 1;
+				}
+			}
+			
+			Arrays.fill(visited, false);
+		}
+		
+		//답 출력
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				sb.append(ans_arr[i][j]+" ");
+			}
+			sb.append("\n");
+		}
+		System.out.println(sb.toString());
+	}
+	
+	//첫번째 경로를 찾으면 다음 이어진 경로를 찾는 것을 재귀로 구현.
+	//(1,2) -> (2,3) -> (3,1) , 방문행렬(T(3), T(1), T(2)) 가로안에 있는 숫자 순서로 True가 체크된다.
+	static void dfs(int n) {
+		for(int i = 0; i < N; i++) {
+			if(!visited[i] && ori_arr[n][i] == 1) {
+				visited[i] = true;
+				dfs(i);
+			}
+		}
+	}
+}

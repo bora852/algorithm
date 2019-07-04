@@ -1,0 +1,104 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Solution {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int T = sc.nextInt();
+		
+		for(int tc = 1; tc <= T; tc++) {
+			int N = sc.nextInt(); // 1 ≤ N ≤ 4
+			int W = sc.nextInt(); // 넓이, 열
+			int H = sc.nextInt(); // 높이, 행
+			
+			int[][] map = new int[H][W];
+			for(int i = 0; i < H; i++) {
+				for(int j = 0; j < W; j++) {
+					map[i][j] = sc.nextInt();
+				}
+			}
+			
+//			for(int[] a : map) {
+//				System.out.println(Arrays.toString(a));
+//			}
+			
+			ans = Integer.MAX_VALUE;
+			ball(map, N);
+			
+			System.out.println("#"+tc+" "+ans);
+		}
+	}
+	
+	static int ans;
+	static void ball(int[][] map, int N) {
+		if(N == 0) {
+			ans = Math.min(ans, getCnt(map));
+			return;
+		}
+		
+		//공을 털어뜨릴 수 있는 모든 경우의 수
+		for(int j = 0; j < map[0].length; j++) {
+			//맵을 복사하는 함수(공떨어뜨리기 전에 복사해두기)
+			int[][] copy = new int[map.length][map[0].length];
+			copyMap(map, copy);
+			for(int i = 0; i < map.length; i++) {
+				if(map[i][j] != 0 ) {
+					//공으로 지워지는 모든 벽돌을 탐색하는 함수
+					bomb(copy, i, j);
+					//아래로 밀착시키는 함수.
+					gravity(copy);
+					break;
+				}
+			}
+			ball(copy, N-1);
+		}
+	}
+	
+	static void gravity(int[][] map) {
+		
+		for(int j = 0; j < map[0].length; j++) {
+			for(int i = map.length-1; i >= 0; i--) {
+				if(map[i][j] == 0) {
+					for(int ii = i-1; ii >= 0; ii--) {
+						if(map[ii][j] != 0) {
+							map[i][j] = map[ii][j];
+							map[ii][j] = 0;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	static void bomb(int[][] map, int a, int b) {
+		if(0 > a || a >= map.length || 0 > b || b >= map[a].length) return;
+	
+		int cnt = map[a][b];
+		map[a][b] = 0;
+		for(int i = 1; i < cnt; i++) {
+			bomb(map, a-i, b);
+			bomb(map, a+i, b);
+			bomb(map, a, b-i);
+			bomb(map, a, b+i);
+		}
+	}
+	
+	static int getCnt(int[][] map) {
+		int cnt = 0;
+		for(int i = 0; i < map.length; i++) {
+			for(int j = 0; j < map[i].length; j++) {
+				if(map[i][j] != 0) cnt++;
+			}
+		}
+		return cnt;
+	}
+	
+	static void copyMap(int[][] origin, int[][] copy) {
+		for(int i = 0; i < origin.length; i++) {
+			for(int j = 0; j < origin[0].length; j++) {
+				copy[i][j] = origin[i][j];
+			}
+		}
+	}
+}
