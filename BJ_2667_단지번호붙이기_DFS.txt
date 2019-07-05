@@ -1,0 +1,56 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		int N = sc.nextInt();
+		int[][] map = new int[N][N];
+		for(int i = 0; i < N; i++) {
+			String temp = sc.next();
+			for(int j = 0; j < N; j++) {
+				map[i][j] = temp.charAt(j)-'0';
+			}
+		}
+		
+		int ans = 0;
+		list = new ArrayList<>();
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				if(map[i][j] == 1) {
+					cnt = 1;
+					dfs(map, i, j);
+					list.add(cnt);
+					ans++;
+				}
+			}
+		}
+		System.out.println(ans);
+		
+		Collections.sort(list);
+		for(int i = 0; i < list.size(); i++) {
+			System.out.println(list.get(i));
+		}
+	}
+	static List<Integer> list;
+	static int cnt;
+	static int[] dx = { -1, 1, 0, 0};
+	static int[] dy = { 0, 0, -1, 1};
+	static void dfs(int[][] map, int i, int j) {
+		map[i][j] = 0;
+		for(int a = 0; a < 4; a++) {
+			int nx = i + dx[a];
+			int ny = j + dy[a];
+			
+			if(0 > nx || nx >= map.length || 0 > ny || ny >= map[nx].length) continue;
+			
+			if(map[nx][ny] == 1) {
+				cnt++;
+				dfs(map, nx, ny);
+			}
+		}
+	}
+}
