@@ -1,0 +1,84 @@
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		int M = sc.nextInt(); //상자의 가로칸의 수,  2 ≤ M,N ≤ 1,000 
+		int N = sc.nextInt(); //상자의 세로칸의 수
+		
+		int[][] arr = new int[N][M];
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < M; j++) {
+				arr[i][j] = sc.nextInt();
+			}
+		}
+		//정수 1은 익은 토마토, 정수 0은 익지 않은 토마토, 정수 -1은 토마토가 들어있지 않은 칸
+//		for(int[] a : arr) System.out.println(Arrays.toString(a));
+		
+		boolean chk = false;
+		Cnt = 0;
+		q = new LinkedList<>();
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < M; j++) {
+				if(arr[i][j] == 1) {
+					q.add(new Point(i, j, 0));
+				}
+			}
+		}
+		bfs(arr);
+		
+//		for(int[] a : arr) System.out.println(Arrays.toString(a));
+		
+		System.out.println(Cnt);
+	}
+	
+	static int Cnt;
+	static Queue<Point> q;
+	static int[] dx = { -1, 1, 0, 0};
+	static int[] dy = {0, 0, -1, 1};
+	static void bfs(int[][] arr) {
+		
+		while(!q.isEmpty()) {
+			Point p = q.poll();
+			int pCnt = p.cnt;
+			for(int i = 0; i < 4; i++) {
+				int nx = p.x + dx[i];
+				int ny = p.y + dy[i];
+				
+				if( 0 <= nx && nx < arr.length && 0 <= ny && ny < arr[nx].length) {
+					if(arr[nx][ny] == 0) {
+						arr[nx][ny] = 1;
+						q.add(new Point(nx, ny, pCnt+1));
+					}
+				}
+			}
+			
+			Cnt = Math.max(Cnt, pCnt);
+		}
+		
+		for(int i = 0; i < arr.length; i++) {
+			for(int j = 0; j < arr[i].length; j++) {
+				if(arr[i][j] == 0) {
+					Cnt = -1;
+					break;
+				}
+			}
+		}
+	}
+	
+}
+
+class Point{
+	int x;
+	int y;
+	int cnt;
+	Point(int x, int y, int cnt){
+		this.x = x;
+		this.y = y;
+		this.cnt = cnt;
+	}
+}

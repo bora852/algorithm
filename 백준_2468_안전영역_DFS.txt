@@ -1,0 +1,142 @@
+- DFS
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out))
+		
+		int N = sc.nextInt();
+		int[][] arr = new int[N][N];
+		int H = 0;
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				arr[i][j] = sc.nextInt();
+				if(H < arr[i][j]) H = arr[i][j];
+			}
+		}
+		
+//		for(int[] a : arr)
+//			System.out.println(Arrays.toString(a));
+		
+		
+		boolean[][] visited = new boolean[N][N];;
+		int cnt = 0;
+		int max = 1;
+		for(int h = 1; h <= H; h++) {
+			visited = new boolean[N][N];
+			cnt = 0;
+			for(int i = 0; i < N; i++) {
+				for(int j = 0; j < N; j++) {
+					if(h < arr[i][j] && !visited[i][j]) {
+						dfs(arr, visited, i, j, h);
+						cnt++;
+					}
+				}
+				
+			}
+			max = Math.max(max, cnt);
+		}
+		
+		System.out.println(max);
+	}
+	
+	static int[] dx = {-1, 1, 0, 0};
+	static int[] dy = {0, 0, -1, 1};
+	static void dfs(int[][] arr, boolean[][] visited, int i, int j, int h) {
+		visited[i][j] = true;
+		for(int k = 0; k < 4; k++) {
+			int nx = dx[k] + i;
+			int ny = dy[k] + j;
+			if(0 <= nx && nx < arr.length && 0 <= ny && ny < arr[nx].length) {
+				if(h < arr[nx][ny] && !visited[nx][ny]) {
+					dfs(arr, visited, nx, ny, h);
+				}
+				
+			}
+		}
+	}
+	
+}
+
+- BFS
+
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		int N = sc.nextInt();
+		int[][] arr = new int[N][N];
+		int H = 0;
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				arr[i][j] = sc.nextInt();
+				if(H < arr[i][j]) H = arr[i][j];
+			}
+		}
+		
+		boolean[][] visited;
+		int cnt;
+		int max = 1;
+		for(int h = 1; h <= H; h++) {
+			visited = new boolean[N][N];
+			cnt = 0;
+			for(int i = 0; i < N; i++) {
+				for(int j = 0; j < N; j++) {
+					if(arr[i][j] > h && !visited[i][j]) {
+						bfs(arr, visited, i, j, h);
+						cnt++;
+					}
+				}
+			}
+			max = Math.max(max, cnt);
+		}
+		
+		System.out.println(max);
+	}
+	
+	static int[] dx = { -1, 1, 0, 0 };
+	static int[] dy = { 0, 0, -1, 1 };
+	static void bfs(int[][] arr, boolean[][] visited, int x, int y, int h) {
+		Queue<Point> q = new LinkedList<>();
+		q.add(new Point(x, y));
+		visited[x][y] = true;
+		while(!q.isEmpty()) {
+			Point p = q.poll();
+			for(int i = 0; i < 4; i++) {
+				int nx = dx[i] + p.x;
+				int ny = dy[i] + p.y;
+				
+				if(0 <= nx && nx < arr.length && 0 <= ny && ny < arr[nx].length) {
+					if(arr[nx][ny] > h && !visited[nx][ny]) {
+						q.add(new Point(nx, ny));
+						visited[nx][ny] = true;
+					}
+				}
+				
+			}
+		}
+	}
+	
+	
+}
+class Point{
+	int x;
+	int y;
+	Point(int x, int y){
+		this.x = x;
+		this.y = y;
+	}
+}

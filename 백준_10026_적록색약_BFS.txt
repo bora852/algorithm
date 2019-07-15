@@ -1,0 +1,82 @@
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int N = sc.nextInt();
+		char[][] map = new char[N][N];
+		for(int i = 0; i < N; i++) {
+			map[i] = sc.next().toCharArray();
+		}
+		
+		boolean[][] visited = new boolean[N][N];
+		//적록색약이 아닌 사람
+		int aCnt = 0;
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				if(!visited[i][j]) {
+					bfs(map, i, j, visited);
+					aCnt++;
+				}
+			}
+		}
+		
+		//G을 R로 바꿈
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				if(map[i][j] == 'G') {
+					map[i][j] = 'R';
+				}
+			}
+		}
+		visited = new boolean[N][N];
+		//적록색약인 사람.
+		int bCnt = 0;
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				if(!visited[i][j]) {
+					bfs(map, i, j, visited);
+					bCnt++;
+				}
+			}
+		}
+		
+		System.out.println(aCnt+" "+bCnt);
+	}
+	
+	static int[] dx = { -1, 1, 0, 0 };
+	static int[] dy = { 0, 0, -1, 1 };
+	static void bfs(char[][] map, int x, int y, boolean[][] visited) {
+		Queue<Point> q = new LinkedList<>();
+		q.add(new Point(x, y));
+		visited[x][y] = true;
+		
+		while(!q.isEmpty()) {
+			Point p = q.poll();
+			for(int i = 0; i < 4; i++) {
+				int nx = dx[i] + p.x;
+				int ny = dy[i] + p.y;
+				
+				if(0 <= nx && nx < map.length && 0 <= ny && ny < map[nx].length) {
+					if(map[p.x][p.y] == map[nx][ny] && !visited[nx][ny]) {
+						
+						q.add(new Point(nx, ny));
+						visited[nx][ny] = true;
+					}
+				}
+			}
+		}
+	}
+}
+
+class Point{
+	int x;
+	int y;
+	Point(int x, int y){
+		this.x = x;
+		this.y = y;
+	}
+}
