@@ -1,0 +1,56 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		int[] arr = new int[9];
+		for(int i = 0; i < arr.length; i++) {
+			arr[i] = sc.nextInt();
+		}
+		
+//		for(int a : arr) System.out.println(a);
+		
+		powerSet(arr, new boolean[arr.length], 0, 0);
+		for(int i = 0; i < list.size(); i++) {
+			System.out.println(list.get(i));
+		}
+	}
+	
+	static ArrayList<Integer> list;
+	static void powerSet(int[] arr, boolean[] chk, int idx, int k) {
+		if(k == 7) {
+			
+			int sum  = 0;
+			for(int i = 0; i < arr.length; i++) {
+				if(chk[i]) {
+					sum += arr[i];
+				}
+			}
+			
+			if(sum == 100) {
+				list = new ArrayList<Integer>();
+				
+				for(int i = 0; i < arr.length; i++) {
+					if(chk[i]) {
+						list.add(arr[i]);
+					}
+				}
+				Collections.sort(list);
+				
+				return;
+			}
+			
+			return;
+		}
+		
+		if(idx == arr.length) return;
+		
+		chk[idx] = true;
+		powerSet(arr, chk, idx+1, k+1);
+		chk[idx] = false;
+		powerSet(arr, chk, idx+1, k);
+	}
+}
