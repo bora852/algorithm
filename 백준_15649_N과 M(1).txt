@@ -1,31 +1,43 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		int N = sc.nextInt();
-		int M = sc.nextInt();
+	static StringBuilder sb = new StringBuilder();
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());		
 		
+		int N = Integer.parseInt(st.nextToken());
+		int M = Integer.parseInt(st.nextToken());
+		
+		int[] result = new int[M];
 		int[] arr = new int[N];
 		for(int i = 1; i <= N; i++) {
 			arr[i-1] = i;
 		}
 		
-//		System.out.println(Arrays.toString(arr));
-		dfs(arr, new boolean[N], 0, "", M );
+		dfs(arr, new boolean[N], 0, result, M );
+		System.out.println(sb);
 	}
 	
-	static void dfs(int[] arr, boolean[] visit, int k, String msg, int M) {
+	static void dfs(int[] arr, boolean[] visit, int k, int[] result, int M) {
 		if(k == M) {
-			System.out.println(msg);
+			for(int i =0; i < M; i++) {
+				sb.append(result[i]+" ");
+			}
+			sb.append("\n");
 			return;
 		}
 		
 		for(int i = 0; i < arr.length; i++) {
 			if(!visit[i]) {
 				visit[i] = true;
-				dfs(arr, visit, k+1, msg + arr[i] + " ", M);
+				result[k] = arr[i];
+				dfs(arr, visit, k+1, result, M);
 				visit[i] = false;
 			}
 		}
