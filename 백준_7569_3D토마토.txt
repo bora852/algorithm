@@ -1,0 +1,101 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
+
+public class Main {
+	static int M;
+	static int N;
+	static int H;
+	static int[][][] map;
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		
+		M = Integer.parseInt(st.nextToken());
+		N = Integer.parseInt(st.nextToken());
+		H = Integer.parseInt(st.nextToken());
+	
+		q = new LinkedList<>();
+		boolean chk = false;
+		map = new int[N][M][H];
+		for(int h = 0; h < H; h++) {
+			for(int i = 0; i < N; i++) {
+				st = new StringTokenizer(br.readLine());
+				for(int j = 0; j < M; j++) {
+					map[i][j][h] = Integer.parseInt(st.nextToken());
+					
+					if(map[i][j][h] == 1) q.add(new Point(i, j, h, 0));
+					else if(map[i][j][h] == 0) chk = true;
+				}
+			}
+		}
+		
+		ans = 0;
+		if(chk) {
+			bfs();
+		}
+		tomatoChk();
+		System.out.println(ans);
+	}
+	
+	static Queue<Point> q;
+	static int ans;
+	static int[] dx = {-1, 1, 0, 0, 0, 0};
+	static int[] dy = {0, 0, -1, 1, 0, 0};
+	static int[] dh = {0, 0, 0, 0, -1, 1};
+	static ArrayList<Point> list;
+	
+	static void bfs() {
+		while(!q.isEmpty()) {
+			
+			System.out.println();
+			Point p = q.poll();
+			int Cnt = p.cnt;
+			for(int i = 0; i < 6; i++) {
+				int nx = dx[i] + p.x;
+				int ny = dy[i] + p.y;
+				int nh = dh[i] + p.h;
+				
+				if(0 <= nx && nx< N && 0 <= ny && ny < M && 0 <= nh && nh <H) {
+					if(map[nx][ny][nh] == 0) {
+						map[nx][ny][nh] = 1;
+						q.add(new Point(nx, ny, nh, Cnt+1));
+					}
+				}
+			}
+			if(ans < Cnt) ans = Cnt;
+		}
+	}
+	
+	static void tomatoChk() {
+		boolean chk = false;
+		outer : for(int h = 0; h < H; h++) {
+			for(int i = 0; i < N; i++) {
+				for(int j = 0; j < M; j++) {
+					if(map[i][j][h] == 0) {
+						chk = true;
+						break outer;
+					}
+				}
+			}
+		}
+		if(chk) ans = -1;
+	}
+	
+	static class Point {
+		int x;
+		int y;
+		int h;
+		int cnt;
+		Point(int x, int y, int h, int cnt){
+			this.x = x;
+			this.y = y;
+			this.h = h;
+			this.cnt = cnt;
+		}
+	}
+	
+}
