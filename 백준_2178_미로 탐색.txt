@@ -1,0 +1,62 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class Main {
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String[] temp = br.readLine().split(" ");
+		int N =  Integer.parseInt(temp[0]);
+		int M =  Integer.parseInt(temp[1]);
+		
+		char[][] map = new char[N][M];
+		for(int i = 0; i < N; i++) {
+			map[i] = br.readLine().toCharArray();
+		}
+		
+		ans = 0;
+		bfs(map, new boolean[N][M]);
+		System.out.println(ans);
+	}
+	
+	static int ans;
+	static int[] dx = {-1, 1, 0, 0};
+	static int[] dy = {0, 0, -1, 1};
+	static void bfs(char[][] map, boolean[][] visited) {
+		
+		Queue<Point> q = new LinkedList<>();
+		q.add(new Point(0, 0, 1));
+		visited[0][0] = true;
+		
+		while(!q.isEmpty()) {
+			Point p = q.poll();
+			for(int i = 0; i < 4; i++) {
+				int nx = dx[i] + p.x;
+				int ny = dy[i] + p.y;
+				
+				if(0 <= nx && nx < map.length && 0 <= ny && ny < map[nx].length && map[nx][ny]=='1' && !visited[nx][ny]) {
+					
+					if(nx == map.length-1 && ny == map[nx].length-1) {
+						ans = p.cnt+1;
+						return;
+					}
+					visited[nx][ny] = true;
+					q.add(new Point(nx, ny, p.cnt+1));
+					
+				}
+			}
+		}
+	}
+	
+	static class Point{
+		int x;
+		int y;
+		int cnt;
+		Point(int x, int y, int cnt){
+			this.x = x;
+			this.y = y;
+			this.cnt = cnt;
+		}
+	}
+}
