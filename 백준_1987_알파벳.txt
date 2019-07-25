@@ -1,0 +1,44 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class Main {
+   public static void main(String[] args) throws Exception{
+      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+      String[] temp = br.readLine().split(" ");
+      int N = Integer.parseInt(temp[0]);
+      int M = Integer.parseInt(temp[1]);
+      
+      char[][] map = new char[N][M];
+      for(int i = 0; i < N; i++) {
+         map[i] = br.readLine().toCharArray();
+      }
+      max = Integer.MIN_VALUE;
+      chk = new boolean[100];
+      dfs(map, 0, 0, new boolean[N][M], 0);
+      System.out.println(max);
+   }
+   
+   static int max;
+   static int[] dx = {-1, 1, 0, 0};
+   static int[] dy = {0, 0, -1, 1};
+   static boolean[] chk;
+   static void dfs(char[][] map, int x, int y, boolean[][] visited, int cnt) {
+      visited[x][y] = true;
+      chk[map[x][y]] = true;
+      cnt++;
+      
+      for(int i = 0; i < 4; i++) {
+         int nx = dx[i] + x;
+         int ny = dy[i] + y;
+         if(0 <= nx && nx < map.length && 0 <= ny && ny < map[nx].length && !visited[nx][ny] && !chk[map[nx][ny]]) {
+        	 
+        	 dfs(map, nx, ny, visited, cnt);
+        	 visited[nx][ny] = false;
+        	 chk[map[nx][ny]] = false;
+        	 
+         }
+      }
+      if(cnt > max) max = cnt;
+      
+   }
+}
