@@ -1,0 +1,133 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
+
+public class Main {
+	
+	static StringTokenizer st;
+	static int[][] map;
+	static int[][] robot;
+	static PriorityQueue<Tree> tree = new PriorityQueue<>();
+	static ArrayList<Tree> dead = new ArrayList<>();;
+	static ArrayList<Tree> birth = new ArrayList<>();
+	static int[] dr = {-1, -1, -1,  0, 0,  1, 1, 1};
+	static int[] dc = {-1,  0,  1, -1, 1, -1, 0, 1};
+	static int N;
+	static int M;
+	static int arrCnt;
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken()); 		//N*N
+		M = Integer.parseInt(st.nextToken()); 		//나무 개수
+		int K = Integer.parseInt(st.nextToken()); 	//연도
+		arrCnt = M;
+		
+		map = new int[N+1][N+1];
+		robot = new int[N+1][N+1];
+		for(int i = 1; i <= N; i++) {
+			st = new StringTokenizer(br.readLine());
+			for(int j = 1; j <= N; j++) {
+				map[i][j] = 5;
+				robot[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+		
+//		for(int i = 0; i <= N; i++) System.out.println(Arrays.toString(map[i]));
+//		System.out.println();
+//		for(int i = 0; i <= N; i++) System.out.println(Arrays.toString(robot[i]));
+		
+		for(int i = 0; i < M; i++) {
+			st = new StringTokenizer(br.readLine());
+			int r = Integer.parseInt(st.nextToken());
+			int c = Integer.parseInt(st.nextToken());
+			int age = Integer.parseInt(st.nextToken());
+			tree.add(new Tree(r, c, age));
+		}
+		
+		for(int i = 0; i < K; i++) {
+			spring();
+			summer();
+			fall();
+			winter();
+		}
+		
+		System.out.println(tree.size());
+	}
+	
+	static void spring() {
+		PriorityQueue<Tree> newTree = new PriorityQueue<>();
+		int cnt = tree.size();
+		for(int i = 0; i < cnt; i++) {
+			Tree t = tree.poll();
+			int r = t.r;
+			int c = t.c;
+			int age = t.age;
+			
+			if(map[r][c] < age) { //나무 죽음
+				dead.add(new Tree(r, c, age));
+			}else {
+				map[r][c] -= age;
+				newTree.add(new Tree(r, c, age + 1));
+				if((age+1) % 5 == 0) {
+					birth.add(new Tree(r, c, age + 1));
+				}
+			}
+		}
+		tree = new PriorityQueue<>(newTree);
+	}
+	
+	static void summer() {
+		for(Tree t : dead) {
+			int r = t.r;
+			int c = t.c;
+			map[r][c] += t.age/2;
+		}
+		dead.clear();
+	}
+	
+	static void fall() {
+		for(Tree t : birth) {
+			int r = t.r;
+			int c = t.c;
+			for(int k = 0; k < 8; k++) {
+				int nr = r + dr[k];
+				int nc = c + dc[k];
+				if(0 < nr && nr <= N && 0 < nc && nc <= N) {
+					tree.add(new Tree(nr, nc, 1));
+				}
+			}
+		}
+		birth.clear();
+	}
+	
+	static void winter() {
+		for(int i = 1; i <= N; i++) {
+			for(int j = 1; j <= N; j++) {
+				map[i][j] += robot[i][j];
+			}
+		}
+	}
+	
+	static class Tree implements Comparable<Tree>{
+		int r;
+		int c;
+		int age;
+		Tree(int r, int c, int age){
+			this.r = r;
+			this.c = c;
+			this.age = age;
+		}
+		
+		@Override
+		public int compareTo(Tree o) {
+			return this.age - o.age;
+		}
+	}
+}
