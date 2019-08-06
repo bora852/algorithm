@@ -1,0 +1,41 @@
+package algo_study_0320;
+
+import java.util.Scanner;
+
+public class Solution {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int T = sc.nextInt();
+		for(int tc = 1; tc <= T; tc++) {
+			int N = sc.nextInt(); //µ·
+			int M = sc.nextInt(); //¿Ê
+			
+			int[][] clothes = new int[M][2];
+			boolean[] chk = new boolean[M]; 
+			for(int i = 0; i < M; i++) {
+				clothes[i][0] = sc.nextInt(); //¿Ê °¡°Ý
+				clothes[i][1] = sc.nextInt(); //¿Ê ¸¸Á·µµ
+			}
+			result = 0;
+			powerSet(clothes, chk, 0, N, M, 0, 0);
+			System.out.println("#"+tc+" "+result);
+		}
+	}
+	
+	static int result;
+	static void powerSet(int[][] clothes, boolean[] chk, int k, int N, int M, int price, int satisfied) {
+		if(k==M) {
+			if(N >= price) {
+				if(result < satisfied) result = satisfied;
+			}
+			return;
+		}
+		
+		if(price+clothes[k][0] <= N) {
+			chk[k] = true;
+			powerSet(clothes, chk, k+1, N, M, price+clothes[k][0], satisfied+clothes[k][1]);
+		}
+		chk[k] = false;
+		powerSet(clothes, chk, k+1, N, M, price, satisfied);
+	}
+}
