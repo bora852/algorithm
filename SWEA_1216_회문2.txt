@@ -1,0 +1,67 @@
+package algo_study_0321;
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Solution_23 {
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		for(int tc = 1; tc <= 10; tc++) {
+			int n = sc.nextInt();
+			
+			char[][] arr = new char[100][100];
+			
+			for(int i = 0; i < 100; i++) {
+				String temp = sc.next();
+				for(int j = 0; j <100; j++) {
+					arr[i][j] = temp.charAt(j);
+				}
+			}
+			
+			int maxLen = 0;
+			//행검사
+			for(int i = 0; i < 100; i++) { //행개수만큼
+				for(int start = 0; start < 99; start++) { //처음 시작 위치, 마지막은 두개만 비교하면 되니까.
+					for(int k = start; k < 99; k++) { 	//검사할 글자개수, k가 1이면 chk가 (100-k)/2만큼 돔, 98일때는 1번만 돌면 되니까.
+						boolean chkPalin = true;        
+						for(int chk = 0; chk < (100-k)/2; chk++) { //검사
+							if(arr[i][start+chk] != arr[i][99+start-chk-k]) {
+								chkPalin = false;
+								break;
+							}
+						}
+						if(chkPalin) {
+							if(maxLen < (99-k+1)) {
+								maxLen = (99-k+1);
+							}
+						}
+					}
+				}
+			}
+			
+			//열검사
+			for(int i = 0; i < 100; i++) { //행개수만큼
+				for(int start = 0; start < 99; start++) { //처음 시작 위치, 마지막은 두개만 비교하면 되니까.
+					for(int k = start; k < 99; k++) { 	//검사할 글자개수
+						boolean chkPalin = true;
+						for(int chk = 0; chk < (100-k)/2; chk++) { //검사
+							if(arr[start+chk][i] != arr[99+start-chk-k][i]) {
+								chkPalin = false;
+								break;
+							}
+						}
+						if(chkPalin) {
+							if(maxLen < (99-k+1)) {
+								maxLen = (99-k+1);
+							}
+						}
+					}
+				}
+			}
+			
+			System.out.println("#"+tc+" "+maxLen);
+		}
+	}
+
+}
