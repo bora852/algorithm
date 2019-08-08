@@ -1,0 +1,123 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Solution_2383 {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+//		Scanner sc = new Scanner("1\r\n" + 
+//				"5\r\n" + 
+//				"0 1 1 0 0\r\n" + 
+//				"0 0 1 0 3\r\n" + 
+//				"0 1 0 1 0\r\n" + 
+//				"0 0 0 0 0\r\n" + 
+//				"1 0 5 0 0");
+		int T = sc.nextInt();
+		for(int tc = 1; tc <= T; tc++ ) {
+			int N = sc.nextInt(); //방의 한 변의 길이 (4 ≤ N ≤ 10)
+			int sCnt = 0; //계단카운트
+			int pCnt = 0; //사람카운트
+			int[][] P = new int[10][2]; //사람 배열 - 행,열,  (1 ≤ 사람의 수 ≤ 10)
+			int[][] S = new int[2][3]; //계단 배열 - 행,열,내려가는데 걸리는 시간 ,  (2 ≤ 계단의 길이 ≤ 10)
+			for(int i = 0; i < N; i++) {
+				for(int j = 0; j < N; j++) {
+					int temp = sc.nextInt();
+					if(temp > 1) {
+						S[sCnt][0] = i;
+						S[sCnt][1] = j;
+						S[sCnt][2] = temp;
+						sCnt++;
+					}
+					if(temp==1) {
+						P[pCnt][0] = i;
+						P[pCnt][1] = j;
+						pCnt++;
+					}
+				}
+			}
+			
+//			System.out.println(Arrays.deepToString(S));
+//			System.out.println(Arrays.deepToString(P));
+			
+			//1번 계단으로 가는 거리 
+			int stair1[] = new int[pCnt];
+			for(int i = 0; i < pCnt; i++) {
+				stair1[i] = Math.abs(P[i][0] - S[0][0]) + Math.abs(P[i][1] - S[0][1]);
+			}
+//			System.out.println(Arrays.toString(stair1));
+			//2번 계단으로 가는 거리
+			int stair2[] = new int[pCnt];
+			for(int i = 0; i < pCnt; i++) {
+				stair2[i] = Math.abs(P[i][0] - S[1][0]) + Math.abs(P[i][1] - S[1][1]);
+			}
+//			System.out.println(Arrays.toString(stair2));
+//			System.out.println();
+			//사람을 1번 계단으로 보내는 경우와 2번 계단으로 보내는 경우 둘다 다 해봐서 제일 최소 시간
+			result = Integer.MAX_VALUE;
+			powerSet(P, S, pCnt, stair1, stair2, 0, new boolean[pCnt]);
+			
+			System.out.println("#"+tc+" "+result);
+		}
+		
+	}
+	static int result;
+	static void powerSet(int[][] p, int[][] s, int pCnt, int[] stair1, int[] stair2, int k, boolean[] chk) {
+		int p1 = 0;
+		if(k == pCnt) {
+			for(int i = 0; i < pCnt; i++) {
+				if(chk[i]) {
+					p1++;
+				}
+			}
+			//계단1의 경우 걸리는 시간
+			int[] time1 = new int[p1]; 
+			//게단2의 경우 걸리는 시간
+			int[] time2 = new int[pCnt-p1];
+			int tc1 = 0, tc2 = 0;
+			for(int i = 0; i < pCnt; i++) {
+				if(chk[i]) {
+					time1[tc1] = stair1[i]; 
+					tc1++;
+				}else {
+					time2[tc2] = stair2[i];
+					tc2++;
+				}
+			}
+			
+			//계단의 최대 이용자는 3명이므로 3번째 앞 사람과 시간 계산
+			Arrays.sort(time1);
+			Arrays.sort(time2);
+//			System.out.println(Arrays.toString(time2));
+			for(int i = 3; i < tc1; i++) { //첫번째 계단
+				if(time1[i-3] + s[0][2] > time1[i]) {
+					time1[i] = time1[i-3] + s[0][2];
+				}
+			}
+			
+			for(int i = 3; i < tc2; i++) { //두번째 계단
+				if(time2[i-3] + s[1][2] > time2[i]) {
+					time2[i] = time2[i-3] + s[1][2];
+				}
+			}
+			
+			int downTime1 = 0;
+			int downTime2 = 0;
+			if(tc1 > 0)
+				downTime1 = time1[tc1-1] + s[0][2] + 1;
+			if(tc2 > 0)
+				downTime2 = time2[tc2-1] + s[1][2] + 1;
+			
+//			System.out.println("시간 : "+Arrays.toString(time1) + ":" +downTime1 + "/" + s[0][2]);
+			int downTime = downTime1 > downTime2 ? downTime1 : downTime2;
+			if(downTime < result) {
+				result = downTime;
+			}
+			
+			return;
+		}
+		
+		chk[k] = true; //계단1 선택
+		powerSet(p, s, pCnt, stair1, stair2, k+1, chk);
+		chk[k] = false; //계단2 선택
+		powerSet(p, s, pCnt, stair1, stair2, k+1, chk);
+	}
+}
