@@ -1,0 +1,181 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
+
+public class Main {
+	static char[][][] cube;
+	static char[] color = new char[]{'w','y','r','o','g','b'};
+	static StringTokenizer st;
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+		int T = Integer.parseInt(br.readLine().trim());
+		for(int tc = 0; tc < T; tc++) {
+			int N = Integer.parseInt(br.readLine().trim());
+
+			cube = new char[6][3][3];
+			//큐브만들고
+			for(int i = 0; i < 6; i++) {
+				for(int j = 0; j < 3; j++) {
+					for(int k = 0; k < 3; k++) {
+						cube[i][j][k] = color[i];
+					}
+				}
+			}
+			
+//			for(int i = 0; i < 6; i++) {
+//				for(int j = 0; j < 3; j++) {
+//					for(int k = 0; k < 3; k++) {
+//						System.out.print(cube[i][j][k]);
+//					}
+//					System.out.println();
+//				}
+//				System.out.println();
+//			}
+			
+			st = new StringTokenizer(br.readLine());
+			for(int j = 0; j < N; j++) {
+				String order = st.nextToken();
+				solve(order.charAt(0), order.charAt(1));
+			}
+			
+			for(int i = 0; i < 3; i++) {
+				for(int j = 0; j < 3; j++) {
+					System.out.print(cube[0][i][j]);
+				}
+				System.out.println();
+			}
+			
+		}
+		
+	}
+	
+	static void solve(char m, char d) {
+		if(d == '+') rotation(m);
+		else {
+			for(int i = 0; i < 3; i++) {
+				rotation(m);
+			}
+		}
+	}
+	
+	static void self(int idx) {
+		char tmp[][] = { { cube[idx][2][0], cube[idx][1][0], cube[idx][0][0] }
+				        ,{ cube[idx][2][1], cube[idx][1][1], cube[idx][0][1] }
+				        ,{ cube[idx][2][2], cube[idx][1][2], cube[idx][0][2] }
+					   };
+		for(int i = 0; i < 3; i++) {
+			for(int j = 0; j < 3; j++) {
+				cube[idx][i][j] = tmp[i][j];
+			}
+		}
+	}
+	
+	static void rotation(char m) {
+		char[] tmp = new char[3];
+		if(m == 'U') {
+			self(0);
+			tmp[0] = cube[2][0][0];
+			tmp[1] = cube[2][0][1];
+			tmp[2] = cube[2][0][2];
+			cube[2][0][0] = cube[5][0][0];
+			cube[2][0][1] = cube[5][0][1];
+			cube[2][0][2] = cube[5][0][2];
+			cube[5][0][0] = cube[3][0][0];
+			cube[5][0][1] = cube[3][0][1];
+			cube[5][0][2] = cube[3][0][2];
+			cube[3][0][0] = cube[4][0][0];
+			cube[3][0][1] = cube[4][0][1];
+			cube[3][0][2] = cube[4][0][2];
+			cube[4][0][0] = tmp[0];
+			cube[4][0][1] = tmp[1];
+			cube[4][0][2] = tmp[2];
+		}else if(m == 'D') {
+			self(1);
+			tmp[0] = cube[2][2][0];
+			tmp[1] = cube[2][2][1];
+			tmp[2] = cube[2][2][2];
+			cube[2][2][0] = cube[4][2][0];
+			cube[2][2][1] = cube[4][2][1];
+			cube[2][2][2] = cube[4][2][2];
+			cube[4][2][0] = cube[3][2][0];
+			cube[4][2][1] = cube[3][2][1];
+			cube[4][2][2] = cube[3][2][2];
+			cube[3][2][0] = cube[5][2][0];
+			cube[3][2][1] = cube[5][2][1];
+			cube[3][2][2] = cube[5][2][2];
+			cube[5][2][0] = tmp[0];
+			cube[5][2][1] = tmp[1];
+			cube[5][2][2] = tmp[2];
+		}else if(m == 'F') {
+			self(2);
+			tmp[0] = cube[0][2][0];
+			tmp[1] = cube[0][2][1];
+			tmp[2] = cube[0][2][2];
+			cube[0][2][0] = cube[4][2][2];
+			cube[0][2][1] = cube[4][1][2];
+			cube[0][2][2] = cube[4][0][2];
+			cube[4][2][2] = cube[1][2][0];
+			cube[4][1][2] = cube[1][2][1];
+			cube[4][0][2] = cube[1][2][2];
+			cube[1][2][0] = cube[5][0][0];
+			cube[1][2][1] = cube[5][1][0];
+			cube[1][2][2] = cube[5][2][0];
+			cube[5][0][0] = tmp[0];
+			cube[5][1][0] = tmp[1];
+			cube[5][2][0] = tmp[2];
+		}else if(m == 'B') {
+			self(3);
+			tmp[0] = cube[0][0][0];
+			tmp[1] = cube[0][0][1];
+			tmp[2] = cube[0][0][2];
+			cube[0][0][0] = cube[5][0][2];
+			cube[0][0][1] = cube[5][1][2];
+			cube[0][0][2] = cube[5][2][2];
+			cube[5][0][2] = cube[1][0][0];
+			cube[5][1][2] = cube[1][0][1];
+			cube[5][2][2] = cube[1][0][2];
+			cube[1][0][0] = cube[4][2][0];
+			cube[1][0][1] = cube[4][1][0];
+			cube[1][0][2] = cube[4][0][0];		
+			cube[4][2][0] = tmp[0];
+			cube[4][1][0] = tmp[1];
+			cube[4][0][0] = tmp[2];
+		}else if(m == 'L') {
+			self(4);
+			tmp[0] = cube[2][0][0];
+			tmp[1] = cube[2][1][0];
+			tmp[2] = cube[2][2][0];
+			cube[2][0][0] = cube[0][0][0];
+			cube[2][1][0] = cube[0][1][0];
+			cube[2][2][0] = cube[0][2][0];
+			cube[0][0][0] = cube[3][2][2];
+			cube[0][1][0] = cube[3][1][2];
+			cube[0][2][0] = cube[3][0][2];
+			cube[3][2][2] = cube[1][2][2];
+			cube[3][1][2] = cube[1][1][2];
+			cube[3][0][2] = cube[1][0][2];
+			cube[1][2][2] = tmp[0];
+			cube[1][1][2] = tmp[1];
+			cube[1][0][2] = tmp[2];
+		}else {//R
+			self(5);
+			tmp[0] = cube[0][0][2];
+			tmp[1] = cube[0][1][2];
+			tmp[2] = cube[0][2][2];
+			cube[0][0][2] = cube[2][0][2];
+			cube[0][1][2] = cube[2][1][2];
+			cube[0][2][2] = cube[2][2][2];
+			cube[2][0][2] = cube[1][2][0];
+			cube[2][1][2] = cube[1][1][0];
+			cube[2][2][2] = cube[1][0][0];
+			cube[1][2][0] = cube[3][2][0];
+			cube[1][1][0] = cube[3][1][0];
+			cube[1][0][0] = cube[3][0][0];
+			cube[3][2][0] = tmp[0];
+			cube[3][1][0] = tmp[1];
+			cube[3][0][0] = tmp[2];
+		}
+	}
+}
