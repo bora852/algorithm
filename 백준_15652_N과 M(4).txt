@@ -1,0 +1,39 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class Main {
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String[] temp = br.readLine().split(" ");
+		int N = Integer.parseInt(temp[0]);
+		int M = Integer.parseInt(temp[1]);
+		arr = new int[N];
+		for(int i = 0; i < N; i++) {
+			arr[i] = i+1;
+		}
+		
+		charArr = new char[M*2];
+		for(int i = 0; i < charArr.length; i++) {
+			charArr[i] = ' ';
+		}
+		
+		dfs(0, M, 1);
+		System.out.println(sb);
+	}
+	static int[] arr;
+	static char[] charArr;
+	static StringBuilder sb = new StringBuilder();
+	static void dfs(int idx, int M, int num) {
+		if(idx == M) {
+			sb.append(charArr).append("\n");
+			return;
+		}
+		
+		for(int i = 0; i < arr.length; i++) {
+			if(num <= arr[i]) {
+				charArr[idx * 2] = (char) (arr[i] + '0'); 
+				dfs(idx+1, M, arr[i]);
+			}
+		}
+	}
+}
