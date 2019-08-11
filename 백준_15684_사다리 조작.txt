@@ -1,0 +1,71 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+public class Main{
+	
+	static StringTokenizer st;
+	static int N; //2 ≤ N ≤ 10, 세로선. 열
+	static int M; //0 ≤ M ≤ (N-1)×H), 놓은 가로선 개수
+	static int H; //1 ≤ H ≤ 30, 세로선마다 놓을 수 있는 가로선 개수. 행
+	static int[][] map;
+	static boolean isOk;
+	static int ans;
+	public static void main(String[] args)  throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); 
+		st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		H = Integer.parseInt(st.nextToken());
+
+		map = new int[H+1][N+1];
+		for(int i = 0; i < M; i++) {
+			st = new StringTokenizer(br.readLine());
+			int r = Integer.parseInt(st.nextToken());
+			int c = Integer.parseInt(st.nextToken());
+			map[r][c] = 1;
+		}
+		
+		isOk = false;
+		for(int i = 1; i <= 3; i++) {
+			ans = i;
+			solve(1, 0);
+			if(isOk) break;
+		}
+		
+		System.out.println(isOk ? ans : -1);
+	}
+	
+	static void solve(int r, int cnt) {
+		if(isOk) return;
+		
+		if(ans == cnt) {
+			if(chk()) isOk = true;
+			return;
+		}
+		
+		for(int i = r; i <= H; i++) {
+			for(int j = 1; j < N; j++) {
+				if(map[i][j] == 1 || map[i][j-1] == 1 || map[i][j+1] == 1) continue;
+				map[i][j] = 1;
+				solve(i, cnt+1);
+				map[i][j] = 0;
+			}
+		}
+	}
+	
+	static boolean chk() {
+		for(int c = 1; c <= N; c++) {
+			int r = 1;
+			int tmp = c;
+			
+			while(r <= H) {
+				if(map[r][tmp] == 1) tmp++;
+				else if(map[r][tmp-1] == 1) tmp--;
+				r++;
+			}
+			if(tmp != c) return false; 
+		}
+		return true;
+	}
+}
