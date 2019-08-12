@@ -1,0 +1,45 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+public class Main {
+	static StringBuilder sb = new StringBuilder();
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		
+		int N = Integer.parseInt(st.nextToken());
+		int M = Integer.parseInt(st.nextToken());
+		
+//		int[] result = new int[M];
+		int[] arr = new int[N];
+		for(int i = 1; i <= N; i++) {
+			arr[i-1] = i;
+		}
+		
+		char[] ans = new char[M * 2];
+		for(int i = 0; i < ans.length; i++) {
+			ans[i] = ' ';
+		}
+		
+		dfs(arr, 0, ans, M );
+		System.out.println(sb);
+	}
+	
+	static void dfs(int[] arr, int k, char[] ans, int M) {
+		if(k == M) {
+			sb.append(ans);
+			sb.append("\n");
+			return;
+		}
+		
+		for(int i = 0; i < arr.length; i++) {
+				ans[k * 2] = (char)(arr[i]+'0');
+				dfs(arr, k+1, ans, M);
+		}
+	}
+	
+}
