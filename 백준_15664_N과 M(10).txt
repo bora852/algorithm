@@ -1,0 +1,70 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+public class Main {
+	static StringTokenizer st;
+	static StringBuilder sb = new StringBuilder();
+	static int N;
+	static int M;
+	static int[] arr;
+	static LinkedHashSet<String> set = new LinkedHashSet<String>();
+	static boolean[] visited;
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		
+		st = new StringTokenizer(br.readLine());
+		
+		arr = new int[N];
+		for(int i = 0; i < N; i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		Arrays.sort(arr);
+		visited = new boolean[N];
+		solve(new int[M], 0, 0, "");
+		
+//		System.out.println(sb.toString());
+//		List<String> list = new ArrayList(set);
+//		Collections.sort(list);
+		//for(String str : set) {
+		/////	System.out.println(str);
+		//}
+		
+		for(String s : set) {
+            sb.append(s.substring(0, s.length()-1)+"\n");
+        }
+        System.out.print(sb.toString());
+	}
+	
+	static void solve(int[] temp, int num, int pre, String str) {
+		if(num == M) {
+//			sb = new StringBuilder();
+//			for(int i = 0; i < M; i++) {
+//				sb.append(temp[i]).append(" ");
+//			}
+//			System.out.println(sb);
+			set.add(str);
+			return;
+		}
+		
+		for(int i = 0; i < N; i++) {
+			if(!visited[i] && pre <= arr[i]) {
+				visited[i] = true;
+//				temp[num] = arr[i];
+				solve(temp, num+1, arr[i], str+arr[i]+" ");
+				visited[i] = false;
+			}
+		}
+	}
+}
