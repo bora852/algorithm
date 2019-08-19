@@ -1,0 +1,51 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class main {
+	static int[][] map;
+	static int N;
+	static int ans;
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
+		
+		ans = 0;
+		map = new int[N][N];
+		solve(0);
+		System.out.println(ans);
+	}
+	
+	static void solve(int line) {
+		if(line == N) {
+			ans++;
+			return;
+		}
+		
+		for(int c = 0; c < N; c++) {
+			int left = c, right = c;
+			boolean chk = true;
+			for(int r = line; r >= 0; r--) {
+				if(map[r][c] == 1) {
+					chk = false;
+					break;
+				}
+				if(left >= 0 && map[r][left] == 1) {
+					chk = false;
+					break;
+				}
+				if(right < N && map[r][right] == 1) {	
+					chk = false;
+					break;
+				}
+				left--;
+				right++;
+			}
+			
+			if(chk) {
+				map[line][c] = 1;
+				solve(line+1);
+				map[line][c] = 0;
+			}
+		}
+	}
+}
