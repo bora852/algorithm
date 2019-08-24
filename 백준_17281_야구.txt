@@ -1,0 +1,131 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
+
+public class Main {
+	static StringTokenizer st;
+	static int N;
+	static int[][] map;
+	static int[] ball;
+	static int ans;
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+		N = Integer.parseInt(br.readLine());
+		map = new int[N][9];
+		for(int i = 0; i < N; i++) {
+			st = new StringTokenizer(br.readLine());
+			for(int j = 0; j < 9; j++) {
+				map[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+		
+//		for(int[] a : map) System.out.println(Arrays.toString(a));
+		
+		ans = 0;
+		ball = new int[8];
+		int num = 1;
+		for(int i = 0; i < 8; i++) {
+			ball[i] = num++;
+		}
+//		System.out.println(Arrays.toString(ball));
+		solve(0);
+		System.out.println(ans);
+	}
+	
+	static void solve(int k) {
+		if(k == 8) {
+			ArrayList<Integer> list = new ArrayList<Integer>();
+			for(int i = 0; i < 9; i++) {
+				if(i < 3) list.add(ball[i]);
+				else if(i == 3) list.add(0);
+				else if(i > 3) list.add(ball[i-1]);
+			}
+//			System.out.println(Arrays.toString(copy));
+//			System.out.println(list);
+			
+			int batting_order = 0; //타순 기억
+			int cnt = 0;
+			for(int i = 0; i < N; i++) {
+				int out = 0;
+				Queue<Integer> juja = new LinkedList<>();
+				boolean[] base = new boolean[4];
+				while(true) {
+					
+					int infor = map[i][list.get(batting_order)];
+					
+					if (batting_order == 8) {
+	                    batting_order = 0;
+	                } else
+	                    batting_order++;
+					
+					if(infor == 0) { 		//아웃
+						out++;
+						if(out >= 3) break;
+					}else if(infor == 1) {	//안타
+						if(base[3]) {
+	                        cnt++;
+	                        base[3] = false;
+	                    }
+	                    for (int j = 2; j >= 0; j--) {
+	                        if(base[j]) {
+	                            base[j] = false;
+	                            base[j+1] = true;
+	                        }
+	                    }
+	                    base[1] = true;
+					}else if(infor == 2) {	//2루타
+						 if(base[3]) {
+		                        cnt++;
+		                        base[3] = false;
+		                    }
+		                    if(base[2]) {
+		                        cnt++;
+		                        base[2] = false;
+		                    }
+		                    if(base[1]) {
+		                        base[1] = false;
+		                        base[3] = true;
+		                    }
+		                    base[2] = true;
+					}else if(infor == 3) {	//3루타
+						for (int j = 1; j <= 3; j++) {
+	                        if(base[j]) {
+	                            cnt++;
+	                            base[j] = false;
+	                        }
+	                    }
+	                    base[3] = true;
+					}else if(infor == 4){ //4홈런
+						for (int j = 1; j <= 3; j++) {
+	                        if(base[j]) {
+	                            cnt++;
+	                            base[j] = false;
+	                        }
+	                    }
+	                    cnt++;
+					}
+				}
+			}
+				
+			if(ans < cnt) ans = cnt;
+			return;
+		}
+		
+		for(int i = k; i < 8; i++) {
+			swap(i, k);
+			solve(k + 1);
+			swap(i, k);
+		}
+	}
+	
+	static void swap(int a, int b) {
+		int temp = ball[a];
+		ball[a] = ball[b];
+		ball[b] = temp;
+	}
+}
