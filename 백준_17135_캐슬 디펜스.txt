@@ -1,0 +1,139 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main {
+   
+   static int N, M, D, ans;
+   static int[][] map;
+   static boolean[] visited;
+   static int[] dr = {0, -1, 0};
+   static int[] dc = {-1, 0, 1};
+   static Queue<Point> q;
+   static boolean[][]  enemyVisited;
+   public static void main(String[] args) {
+      Scanner sc = new Scanner(System.in);
+
+      N = sc.nextInt();
+      M = sc.nextInt();
+      D = sc.nextInt();
+      map = new int[N + 1][M];
+      int enemy = 0;
+      for(int i = 0; i < N; i++) {
+         for(int j = 0; j < M; j++) {
+            map[i][j] = sc.nextInt();
+            if(map[i][j] == 1) enemy++;
+         }
+      }
+      
+      ans = 0;
+      archer(0, 0, enemy);
+      System.out.println(ans);
+   }
+   
+   static void archer(int cnt, int idx, int enemy) {
+      if(cnt == 3) {
+         
+         int[][] copy = new int[map.length][map[0].length];
+         mapCopy(copy);
+         
+         ArrayList<Point> list = new ArrayList<>(); 
+         int max = 0;
+         int row = 0;
+         while(enemy > 0) {
+        	 
+            list.clear(); //제거할 적을 담아두는 list
+            
+            //공격
+            for(int c = 0; c < M; c++) { //마지막 열에 있는 궁수, 3명
+               if(map[N][c] == 2) {
+                  enemyVisited = new boolean[N+1][M];
+            	   
+                  q = new LinkedList<>();
+                  q.add(new Point(N, c));
+                  enemyVisited[N][c] = true;
+                  
+                 while(!q.isEmpty()) { //적찾기
+                	 Point p = q.poll();
+                	 
+                	 if(copy[p.r][p.c] == 1) {
+                		 list.add(new Point(p.r, p.c));
+                		 break;
+                	 }
+                	 
+                     for(int k = 0; k < 3; k++) {
+                        int nr = dr[k] + p.r;
+                        int nc = dc[k] + p.c;
+                        
+                        if(0 <= nr && nr < N && 0 <= nc && nc < M) {
+                           if(!enemyVisited[nr][nc] && ( (Math.abs(N - nr) + Math.abs(c - nc) ) <= D )) {
+                        	   q.add(new Point(nr, nc));
+                        	   enemyVisited[nr][nc] = true;
+                           }
+                        }
+                     }
+                     
+                  }
+                  
+               }
+            }
+            
+            //적죽이기. 중복된 적 제외.
+            for(Point p : list) {
+               if(copy[p.r][p.c] != 0) {
+            	  copy[p.r][p.c] = 0;
+                  enemy--;
+                  max++;
+               }
+            }
+            
+            //성쪽으로 이동한 적들. 
+            for(int c = 0; c < M; c++) {
+               if(copy[N-1][c] == 1) enemy--; 
+            }
+            
+            //적 내리기
+            for(int r = N-1; r > 0; r--) {
+               for(int c = 0; c < M; c++) { 
+            	   copy[r][c] = copy[r-1][c]; 
+               }
+            }
+            
+            //처음 적이 있던 열 초기화
+            for(int c = 0; c < M; c++) {
+               copy[row][c] = 0;
+            }
+            row++;
+            
+         }
+         
+         if(max > ans) ans = max;
+         
+         return;
+      }
+      
+      for(int i = idx; i < M; i++) {
+         if(map[N][i] != 2) {
+            map[N][i] = 2;
+            archer(cnt + 1, i, enemy);
+            map[N][i] = 0;
+         }
+      }
+   }
+   
+   static void mapCopy(int[][] copy) {
+      for(int i = 0; i < copy.length; i++) {
+         copy[i] = Arrays.copyOf(map[i], map[i].length);
+      }
+   }
+
+   static class Point{
+      int r, c;
+      Point(int r, int c){
+         this.r = r;
+         this.c = c;
+      }
+   }
+}
