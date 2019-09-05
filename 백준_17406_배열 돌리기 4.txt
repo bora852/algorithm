@@ -1,0 +1,145 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+   static int N, M, K;
+   static int[][] map;
+   static Point[] dir;
+   static int ans;
+   static int[] dr = {0, 1, 0, -1};
+   static int[] dc = {1, 0, -1, 0};
+   public static void main(String[] args) {
+      Scanner sc = new Scanner(System.in);
+
+      N = sc.nextInt();
+      M = sc.nextInt();
+      K = sc.nextInt();
+      map = new int[N + 1][M + 1];
+      for(int i = 1; i <= N; i++) {
+         for(int j = 1; j <= M; j++) {
+            map[i][j] = sc.nextInt();
+         }
+      }
+      
+      dir = new Point[K];
+      for(int i = 0; i < K; i++) {
+         dir[i] = new Point(sc.nextInt(), sc.nextInt(), sc.nextInt());
+      }
+      
+      ans = 987654321;
+      
+      boolean[] visited = new boolean[K];
+     solve(0, map, visited, 0);
+      
+      
+      System.out.println(ans);
+   }
+   
+   static void solve(int cnt, int[][] originMap, boolean[] visited, int idx) {
+      if(cnt == K) {
+
+         for(int i = 1; i <= N; i++) {
+            int sum = 0;
+            for(int j = 1; j <= M; j++) {
+               sum += originMap[i][j];
+            }
+            if(sum < ans) ans = sum;
+         }
+         return;
+      }
+      
+      
+      
+  for(int i = 0; i < K; i++) {
+      if(!visited[i]) {
+         visited[i] = true;
+      
+      
+      Point p = dir[i];
+      int nr1 = p.r - p.cnt;
+      int nc1 = p.c - p.cnt;
+      int nr2 = p.r + p.cnt;
+      int nc2 = p.c + p.cnt;
+      
+      int[][] newMap = new int[N+1][M+1];
+      //시계 방향으로 돌리기.
+      while(true) {
+         int tnr = nr1;
+         int tnc = nc1;
+         
+         //우
+         while(true) {
+            if(tnc + 1 <= nc2) {
+               newMap[tnr][tnc + 1] = originMap[tnr][tnc];
+               tnc++;
+            }else break;
+         }
+         
+         //하
+         while(true) {
+            if(tnr + 1 <= nr2) {
+               newMap[tnr + 1][tnc] = originMap[tnr][tnc];
+               tnr++;
+            }else break;
+         }
+         
+         //좌
+         while(true) {
+            if(tnc - 1 >= nc1) {
+               newMap[tnr][tnc - 1] = originMap[tnr][tnc];
+               tnc--;
+            }else break;
+         }
+         
+         //상
+         while(true) {
+            if(tnr - 1 >= nr1) {
+               newMap[tnr - 1][tnc] = originMap[tnr][tnc];
+               tnr--;
+            }else break;
+         }
+             
+         nr1 += 1;
+         nc1 += 1;
+         nr2 -= 1;
+         nc2 -= 1;
+         if(nr1 == nr2 || nc1 == nc2) {
+            break;
+         }
+         
+      }
+      //맵복사
+      mapCopy(newMap, originMap, nc1, nr2);
+      
+      solve(cnt+1, newMap, visited, i);
+      visited[i] = false;
+   }
+}
+      
+   }
+   
+   static void mapCopy(int[][] newMap, int[][] originMap, int nc, int nr) {
+      for(int i = 1; i <= N; i++) {
+         for(int j = 1; j <= M; j++) {
+            if(newMap[i][j] == 0) {
+               newMap[i][j] = originMap[i][j];
+            }
+         }
+      }
+   }
+   
+   static class Point{
+      int r;
+      int c;
+      int cnt;
+      Point(int r, int c, int cnt){
+         this.r = r;
+         this.c = c;
+         this.cnt = cnt;
+      }
+      @Override
+      public String toString() {
+         return r+" "+c+" "+cnt;
+      }
+   }
+}
