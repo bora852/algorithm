@@ -1,0 +1,86 @@
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main {
+
+   static int H, W, K;
+   static int[][] map;
+   static int ans;
+   public static void main(String[] args) {
+      Scanner sc = new Scanner(System.in);
+      K = sc.nextInt();
+      W = sc.nextInt(); //ї­
+      H = sc.nextInt(); //За
+      map = new int[H][W];
+      for(int i = 0; i < H; i++) {
+         for(int j = 0; j < W; j++) {
+            map[i][j] = sc.nextInt();
+         }
+      }
+      
+      ans = 987654321;
+      solve();
+      System.out.println(ans == 987654321 ? -1 : ans);
+   }
+   
+   static int[] dr =  { 0, 0, 1, -1, 1, 2, 2, 1, -1, -2, -2, -1 };
+   static int[] dc =  { 1, -1, 0, 0, -2, -1, 1, 2, 2, 1, -1, -2 };
+
+   static void solve() {
+      boolean[][][] visited = new boolean[H][W][K+1];
+      
+      Queue<Point> q = new LinkedList<>();   
+      q.add(new Point(0, 0, K, 0));
+      visited[0][0][K] = true;
+      
+      while(!q.isEmpty()) {
+         Point p = q.poll();
+         if(p.r == H-1 && p.c == W-1) {
+            
+            ans = Math.min(p.cnt, ans);
+            return;
+         }
+         
+         for(int i = 0; i < 12; i++) {
+            if(p.k <= 0 && i > 3) break;
+            int nr = dr[i] + p.r;
+            int nc = dc[i] + p.c;
+            int ncnt = p.cnt + 1;
+            
+            
+            int nk = 0;
+            if(i > 3) {
+               nk = p.k - 1;
+            }else {
+               nk = p.k;
+            }
+            
+            if(0 <= nr && nr < H && 0 <= nc && nc < W && map[nr][nc] == 0 && !visited[nr][nc][nk]) {
+                  visited[nr][nc][nk] = true;
+            	  q.add(new Point(nr, nc, nk, ncnt));
+            }
+         }
+      }
+   }
+   
+   
+   static class Point{
+      int r;
+      int c;
+      int k;
+      int cnt;
+      Point(int r, int c, int k, int cnt){
+         this.r = r;
+         this.c = c;
+         this.k = k;
+         this.cnt = cnt;
+      }
+      
+      @Override
+    public String toString() {
+    	return r+" "+c+" "+k+" "+cnt ;
+    }
+   }
+}
