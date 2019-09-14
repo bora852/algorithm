@@ -1,0 +1,64 @@
+package algo_0311;
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main_CabbageWorm_dfs {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int T = sc.nextInt();
+		
+		for(int tc = 1; tc <= T; tc++) {
+			int M = sc.nextInt(); //가로
+			int N = sc.nextInt(); //세로
+			int K = sc.nextInt(); //배추가 심어져 있는 위치의 개수
+			
+			int[][] map = new int[M][N];
+			for(int i = 0; i < K; i++) {
+				int a = sc.nextInt(); //x
+				int b = sc.nextInt(); //y
+				map[a][b] = 1;
+			}
+			
+//			for(int[] a : map) {
+//				System.out.println(Arrays.toString(a));
+//			}
+//			
+			count = 0;
+			boolean [][]visited = new boolean[M][N]; 
+			//1인 곳을 탐색한다.
+			for(int i = 0; i < M; i++) {
+				for(int j = 0; j < N; j++) {
+					if(map[i][j]==1 & !visited[i][j]) {
+						visited[i][j] = true;
+						dfs(map, visited, i, j);
+//						for(boolean[] a : visited) {
+//							System.out.println(Arrays.toString(a));
+//						}
+						count++;
+					}
+				}
+			}
+			System.out.println(count);
+		}
+	}
+	static int[] di = {-1,1,0,0};
+	static int[] dj = {0,0,-1,1};
+	static int count;
+	static void dfs(int[][] map, boolean[][] visited, int i, int j) {
+		
+		for(int k = 0; k < 4; k++) {
+			int ni = i + di[k];
+			int nj = j + dj[k];
+			if(ni < 0 || ni >= map.length || nj < 0 || nj >= map[ni].length) {
+				continue;
+			}
+			
+			if(map[ni][nj]==1 && !visited[ni][nj]) {
+				visited[ni][nj] = true;
+				dfs(map, visited, ni, nj);
+			}
+		}
+		
+	}
+}
