@@ -62,3 +62,80 @@ public class Main_CabbageWorm_dfs {
 		
 	}
 }
+
+package algo_0311;
+
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main_CabbageWorm_bfs_ {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int T = sc.nextInt();
+		
+		for(int tc = 1; tc <= T; tc++) {
+			int M = sc.nextInt(); //가로
+			int N = sc.nextInt(); //세로
+			int K = sc.nextInt(); //배추가 심어져 있는 위치의 개수
+			
+			int[][] map = new int[M][N];
+			for(int i = 0; i < K; i++) {
+				int a = sc.nextInt(); //x
+				int b = sc.nextInt(); //y
+				map[a][b] = 1;
+			}
+			count = 0;
+			boolean [][]visited = new boolean[M][N]; 
+			//1인 곳을 탐색한다.
+			q = new LinkedList<>();
+			for(int i = 0; i < M; i++) {
+				for(int j = 0; j < N; j++) {
+					if(map[i][j]==1 && !visited[i][j]) {
+						q.add(new Point(i, j));
+						visited[i][j] = true;
+						bfs(map, visited);
+						count++;
+					}
+				}
+			}
+			
+			System.out.println(count);
+		}
+	}
+	static int[] di = {-1,1,0,0};
+	static int[] dj = {0,0,-1,1};
+	static int count;
+	static Queue<Point> q;
+	static void bfs(int[][] map, boolean[][] visited) {
+		
+		while(!q.isEmpty()) {
+			Point p = q.poll();
+			for(int k = 0; k < 4; k++) {
+				int ni = p.i + di[k];
+				int nj = p.j + dj[k];
+				
+				if(ni < 0 || nj < 0 || ni >= map.length || nj >= map[ni].length) {
+					continue;
+				}
+				
+				if(map[ni][nj]==1 && !visited[ni][nj]) {
+					visited[ni][nj] = true;
+					q.add(new Point(ni, nj));
+					
+				}
+				
+			}
+		}
+		
+	}
+	
+	static class Point{
+		int i;
+		int j;
+		Point(int i, int j){
+			this.i = i;
+			this.j = j;
+		}
+	}
+}
