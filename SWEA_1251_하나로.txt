@@ -1,0 +1,94 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
+
+public class Solution {
+	static Node[] nodes, lines;
+	static int[] parents;
+	static StringTokenizer st;
+	
+	private static class Node implements Comparable<Node>{
+		int r;
+		int c;
+		long cost;
+		private Node(int r, int c){
+			this.r = r;
+			this.c = c;
+		}
+		
+		@Override
+		public int compareTo(Node o) {
+			return Long.compare(this.cost, o.cost);
+		}
+	}
+	
+	private static int find(int a) {
+		if(parents[a] < 0) return a;
+		return parents[a] = find(parents[a]);
+	}
+	
+	private static boolean union(int a, int b) {
+		int RootA = find(a);
+		int RootB = find(b);
+		System.out.println(RootA+" "+RootB);
+		if(RootA != RootB) {
+			parents[RootA] = RootB;
+			return true;
+		}
+		return false;
+	}
+	
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int T = Integer.parseInt(br.readLine());
+		
+		for(int tc = 1; tc <= 2; tc++) {
+			double ans = 0;
+			int N = Integer.parseInt(br.readLine());
+			parents = new int[N];
+			nodes = new Node[N];
+			lines = new Node[N * N];
+			String[] R = br.readLine().split(" ");
+			String[] C = br.readLine().split(" ");
+			
+			for(int i = 0; i < N; i++) {
+				nodes[i] = new Node(Integer.parseInt(R[i]), Integer.parseInt(C[i]));
+			}
+			
+			double e = Double.parseDouble(br.readLine());
+			
+			int cnt = 0;
+			
+			//크루스칼 알고리즘, 모든 간선들의 가중치를 구한다.
+			for(int i = 0; i < N; i++) {
+				for(int j = 0; j < N; j++) {
+					lines[cnt] = new Node(i, j);
+					lines[cnt++].cost = (long)(nodes[i].r - nodes[j].r) * (nodes[i].r - nodes[j].r) 
+							+ (long)(nodes[i].c - nodes[j].c) * (nodes[i].c - nodes[j].c);
+				}
+			}
+			
+			//간선들을 오름차순으로 정렬한다.
+			Arrays.sort(lines);
+			Arrays.fill(parents, -1);
+			
+			for(Node temp : lines) {
+				System.out.println(temp.cost);
+			}
+			
+			for(int i = 0; i < lines.length; i++) {
+				System.out.println(Arrays.toString(parents));
+				Node cur = lines[i];
+				if(cur.cost == 0) continue;
+				if(union(cur.r, cur.c)) {
+					System.out.println();
+					ans += cur.cost;
+				}
+			}
+			
+			ans *= e;
+			System.out.println("#"+tc+" "+Math.round(ans));
+		}
+	}
+}
