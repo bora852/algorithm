@@ -1,0 +1,54 @@
+import java.util.ArrayList;
+
+public class Solution99{
+	
+	public static void main(String[] args) {
+		
+		Solution99 sol = new Solution99();
+		String[] temp = {"RECEIVE abcd@naver.com", "RECEIVE zzkn@naver.com", "DELETE", "RECEIVE qwerty@naver.com", "SAVE", "SAVE", "DELETE", "RECEIVE QwerTY@naver.com", "SAVE"};
+		sol.solution(temp);
+		
+		//record -> 1 이상 10,000 이하입니다.
+		//"RECEIVE [메일 주소]", "DELETE", "SAVE"
+		//아이디의 길이는 1 이상 10 이하이며, 대, 소문자를 구분
+		
+	}
+	
+	public String[] solution(String[] record) {
+		ArrayList<String> list = new ArrayList<>();
+		ArrayList<String> yimsi = new ArrayList<>();
+		
+		for(String tmp : record) {
+			String[] temp = tmp.split(" ");
+//			System.out.println("명령어 : " + Arrays.toString(temp));
+			
+			if(temp[0].equals("RECEIVE")) {
+				yimsi.add(temp[1]);
+//				System.out.println("yimsi :: " + yimsi);
+				
+			}else if(temp[0].equals("SAVE")) {
+				
+				for(int i = 0; i < yimsi.size(); i++) {
+					list.add(yimsi.get(i));
+				}
+				yimsi.clear();
+//				System.out.println("SAVE :: "+list);
+				
+			}else { //Delete
+				if(yimsi.size() > 0) {
+					yimsi.remove(yimsi.size()-1);
+				}
+//				System.out.println("Delete : "+yimsi);
+			}
+		}
+		
+//		System.out.println("answer : "+list);
+
+		String[] answer = new String[list.size()];
+		for(int i = 0; i < list.size(); i++) {
+			answer[i] = list.get(i);
+		}
+//		System.out.println(Arrays.toString(answer));
+		return answer;
+	}
+}
