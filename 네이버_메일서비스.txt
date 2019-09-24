@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 
-public class Solution99{
+public class Solution{
 	
 	public static void main(String[] args) {
 		
-		Solution99 sol = new Solution99();
+		Solution sol = new Solution();
 		String[] temp = {"RECEIVE abcd@naver.com", "RECEIVE zzkn@naver.com", "DELETE", "RECEIVE qwerty@naver.com", "SAVE", "SAVE", "DELETE", "RECEIVE QwerTY@naver.com", "SAVE"};
 		sol.solution(temp);
 		
