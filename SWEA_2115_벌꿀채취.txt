@@ -1,144 +1,124 @@
-import java.util.Arrays;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+ 
+public class Solution {
+    static int n,m,c;
+    static int[][] arr;
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
+        int tc = Integer.parseInt(br.readLine());
+        for(int i=1;i<=tc;i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            n = Integer.parseInt(st.nextToken());
+            m = Integer.parseInt(st.nextToken()); // 채취 가능 벌통 수(연속)
+            c = Integer.parseInt(st.nextToken()); // 담기 가능 제한 수
+            arr = new int[n][n];
+            for(int j=0;j<n;j++) {
+                st = new StringTokenizer(br.readLine());
+                for(int k=0;k<n;k++)
+                    arr[j][k] = Integer.parseInt(st.nextToken());
+            }
+            
+            visited = new boolean[n][n];
+            list = new ArrayList<>();
+            max = 0;
+            // 열은  n-m만큼만 진행 해주면 된다.
+            for(int j=0;j<n;j++) {
+                for(int k=0;k<=n-m;k++)
+                    solve(j,k);
+            }
+            result = 0;
+            // list 안에 들어간 값들로 Max값 찾기
+            solve2(0,0,0);
+            sb.append("#"+i+" "+result+"\n");
+        }
+        System.out.print(sb);
+    }
+    
+    static int result;
+    static boolean[][] visited;
+    private static void solve2(int idx,int sum,int cnt) {
+        // getMax와 동일한 방식으로 모든 조건을 살펴 Max값을 찾아주자.
+        if(cnt==2) {
+            result = Math.max(result, sum);
+            return;
+        }
+        // idx를 넘을경우 return
+        if(idx>=list.size()) return;
+        
+        int x = list.get(idx).x;
+        int y = list.get(idx).y;
+        
+        boolean flag = false;
+        for(int i=y;i<y+m;i++) {
+            if(visited[x][i]) {
+                flag = true;
+                break;
+            }
+        }
+        if(flag) {
+            // 해당 index가 포함 안되도 다음걸로 넘겨는 주기.
+            solve2(idx+1,sum,cnt);
+            return;
+        }
+        
+        // 겹치지 않는다면 겹침 체크해주기
+        for(int i=y;i<y+m;i++)
+            visited[x][i] = true;
+        // 자신 포함
+        solve2(idx+1,sum+list.get(idx).value,cnt+1);
+        // 이제 사용안하므로 겹침 체크 풀어주기
+        for(int i=y;i<y+m;i++)
+            visited[x][i] = false;
+        // 자신 미포함
+        solve2(idx+1,sum,cnt);
+    }
+    
+    // 최대 값을 찾아라? -> 모든 경우의 수를 따져보자
+    static int max;
+    static List<Pair> list;
+    private static void solve(int x,int y) {
 
-public class Solution_ {
-	static int[][] map;
-	static int N, M, C, ans;
-	static boolean[][] visited;
-	static int[] worker1, worker2;
-	public static void main(String[] args) {
-		//Scanner sc = new Scanner(System.in);
-		Scanner sc = new Scanner(src);
-		int T = sc.nextInt();
-		
-		for(int tc = 1; tc <= 1; tc++) {
-			N = sc.nextInt(); //벌통크기
-			M = sc.nextInt(); //선택할 수 있는 벌통의 개수
-			C = sc.nextInt(); //꿀을 채취할 수 있는 최대 양
-			map = new int[N][N];
-			visited = new boolean[N][N];
-			worker1 = new int[M];
-			worker2 = new int[M];
-			for(int i = 0; i < N; i++) {
-				for(int j = 0; j < N; j++) {
-					map[i][j] = sc.nextInt();
-				}
-				System.out.println(Arrays.toString(map[i]));
-			}
-			
-			ans = 0;
-			solve(0, 0, 0);
-			
-			System.out.println("#"+tc+" "+ans);
-		}
-	}
-	
-	static void solve(int cnt, int r, int c) {
-		if(cnt == 2) { //일꾼이 벌꿀을 다 채취하면
-			
-			
-			for(int i = 0; i < N; i++) {
-				System.out.println(Arrays.toString(visited[i]));
-			}
-			System.out.println();
-			
-			
-			
-			//max
-			return;
-		}
-		
-
-		//벌꿀채취
-		for(int i = r; i < N; i++) {
-			for(int j = c; j < N; j++) {
-
-				if(j + M <= N && !visited[i][j]) {
-//					System.out.println(">> "+i+" "+j);
-					for(int jj = j; jj < j + M; jj++) {
-						visited[i][jj] = true;
-					}
-					solve(cnt + 1, i, j + M);
-					for(int jj = j; jj < j + M; jj++) {
-						visited[i][jj] = false;
-					}
-					j += M;
-				}else {
-					solve(cnt, r + 1, 0);
-				}
-			}
-		}
-	}
-	
-	static String src = "10\r\n" + 
-			"4 2 13\r\n" + 
-			"6 1 9 7\r\n" + 
-			"9 8 5 8\r\n" + 
-			"3 4 5 3\r\n" + 
-			"8 2 6 7\r\n" + 
-			"3 3 10\r\n" + 
-			"7 2 9\r\n" + 
-			"6 6 6\r\n" + 
-			"5 5 7\r\n" + 
-			"4 1 10\r\n" + 
-			"8 1 8 2\r\n" + 
-			"4 6 1 6\r\n" + 
-			"4 9 6 3\r\n" + 
-			"7 4 1 3\r\n" + 
-			"4 3 12\r\n" + 
-			"8 8 6 5\r\n" + 
-			"5 2 7 4\r\n" + 
-			"8 5 1 7\r\n" + 
-			"7 8 9 4\r\n" + 
-			"5 2 11\r\n" + 
-			"7 5 9 9 6\r\n" + 
-			"7 3 7 9 3\r\n" + 
-			"1 7 1 4 5\r\n" + 
-			"1 7 9 2 6\r\n" + 
-			"6 6 8 3 8\r\n" + 
-			"6 3 20\r\n" + 
-			"8 5 2 4 3 1\r\n" + 
-			"4 3 6 1 1 8\r\n" + 
-			"4 4 1 2 3 1\r\n" + 
-			"1 7 4 9 6 1\r\n" + 
-			"6 5 1 2 8 4\r\n" + 
-			"3 1 4 5 1 3\r\n" + 
-			"7 2 11\r\n" + 
-			"2 8 2 5 2 8 6\r\n" + 
-			"2 3 7 4 6 4 8\r\n" + 
-			"3 7 8 3 9 4 4\r\n" + 
-			"8 8 5 9 3 6 9\r\n" + 
-			"9 7 6 2 4 1 3\r\n" + 
-			"2 9 2 8 9 7 3\r\n" + 
-			"2 1 7 2 7 8 3\r\n" + 
-			"8 3 12\r\n" + 
-			"9 1 6 7 5 4 6 7\r\n" + 
-			"9 5 1 8 8 3 5 8\r\n" + 
-			"5 2 6 8 6 9 2 1\r\n" + 
-			"9 2 1 8 7 5 2 3\r\n" + 
-			"6 5 5 1 4 5 7 2\r\n" + 
-			"1 7 1 8 1 9 5 5\r\n" + 
-			"6 2 2 9 2 5 1 4\r\n" + 
-			"7 1 1 2 5 9 5 7\r\n" + 
-			"9 4 20\r\n" + 
-			"5 2 4 8 3 7 6 2 1\r\n" + 
-			"7 9 8 5 8 2 6 3 6\r\n" + 
-			"1 9 4 6 7 5 3 1 1\r\n" + 
-			"4 4 7 6 2 2 8 1 7\r\n" + 
-			"9 6 8 5 7 3 7 9 5\r\n" + 
-			"7 3 1 4 1 1 8 5 3\r\n" + 
-			"4 6 8 9 4 5 3 8 8\r\n" + 
-			"1 3 4 2 4 1 1 3 6\r\n" + 
-			"5 9 2 3 5 2 4 8 5\r\n" + 
-			"10 5 30\r\n" + 
-			"7 4 7 5 9 3 6 4 6 7\r\n" + 
-			"8 9 8 4 5 7 8 9 2 9\r\n" + 
-			"6 5 3 4 6 4 7 6 3 2\r\n" + 
-			"4 7 4 3 4 7 3 3 4 3\r\n" + 
-			"3 5 6 4 8 8 2 1 8 6\r\n" + 
-			"3 7 9 7 1 7 6 2 8 9\r\n" + 
-			"3 6 1 6 8 9 7 7 5 1\r\n" + 
-			"4 3 5 6 2 1 2 6 3 6\r\n" + 
-			"3 4 9 2 1 5 9 9 6 3\r\n" + 
-			"9 9 7 3 7 5 5 5 8 4";
+        if(y+m>n) {
+            return;        
+        }
+        // 선택할 칸 체크
+        int[] tArr = new int[m];
+        // m 개만큼 넣기
+        for(int i=y,idx=0;i<y+m;i++)
+            tArr[idx++] = arr[x][i];
+        // 얻은 m개 값으로 모든 조건을 따져서 가장 큰값 구해주기
+        tSum=0;
+        getMax(tArr,0,0,0);
+        list.add(new Pair(tSum, x, y));
+    }
+    
+    static int tSum;
+    private static void getMax(int[] tArr,int idx,int sum,int sSum) {
+        // 끝까지 살펴봤으면 종료
+        if(idx==m) {
+            tSum = Math.max(tSum, sSum);
+            return;
+        }
+        // c보다 작다면 해당 index 포함
+        if(sum+tArr[idx]<=c) {
+            getMax(tArr, idx+1, sum+tArr[idx], sSum+tArr[idx]*tArr[idx]);
+        }
+        // 해당 index 미포함
+        getMax(tArr,idx+1,sum,sSum);
+    }
+    
+    static class Pair{
+        private int value,x,y;
+        public Pair(int value,int x,int y) {
+            this.value = value;
+            this.x = x;
+            this.y = y;
+        }
+    }
 }
