@@ -78,7 +78,7 @@ public class Solution {
         // 자신 미포함
         solve2(idx+1,sum,cnt);
     }
-    
+     
     // 최대 값을 찾아라? -> 모든 경우의 수를 따져보자
     static int max;
     static List<Pair> list;
