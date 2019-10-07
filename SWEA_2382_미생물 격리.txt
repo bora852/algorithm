@@ -1,10 +1,14 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
-public class Solution {
+public class Solution2 {
 	static int N, M, K, R, C, cnt, dir;
 	static Point[][] map;
 	static ArrayList<Point> list;
+	static int[][][] visited;
+    static int[][] arrM,arrN,arrD;
 	static int[] dr = {0, -1, 1, 0, 0}; // (상: 1, 하: 2, 좌: 3, 우: 4)
 	static int[] dc = {0, 0, 0, -1, 1};
 	public static void main(String[] args) {
@@ -12,80 +16,82 @@ public class Solution {
 		Scanner sc = new Scanner(src);
 		int T = sc.nextInt();
 		
-		for(int tc = 1; tc <=T; tc++) {
-			
+		for(int tc = 1; tc <= T; tc++) {
+			visited = new int[100][100][1001];
+	        arrN = new int[100][100];
+	        arrD = new int[100][100];
+	        arrM = new int[100][100];
+	        
 			N = sc.nextInt(); //셀의 개수
 			M = sc.nextInt(); //격리 시간
 			K = sc.nextInt(); //미생물 군집수
+			
 			list = new ArrayList<>();
-			map = new Point[N][N];
+			//map = new Point[N][N];
+			
 			for(int i = 0; i < K; i++) {
 			//세로 위치, 가로 위치, 미생물 수, 이동 방향
 				R = sc.nextInt();
 				C = sc.nextInt();
 				cnt = sc.nextInt();
 				dir = sc.nextInt();
-				list.add(new Point(R, C, cnt, dir));
+				list.add(new Point(R, C, cnt, dir, 0));
 			}
 			
 			solve();
-			
 			System.out.println("#"+tc+" "+getCount());
 		}
 	}
 	
+	static ArrayList<Point> newList; 
 	static void solve() {
-		ArrayList<Point> newList = new ArrayList<>();
+		Queue<Point> queue = new LinkedList<>();
 		
-		for(int m = 0; m < M; m++) {
-			for(int i = 0; i < list.size(); i++){
-				Point p = list.get(i);
+		for(int i=0; i<K; i++) {
+            queue.add(list.get(i));
+            visited[list.get(i).r][list.get(i).c][0]++;
+        }
+		int result = 0;
+		while(!queue.isEmpty()) {
+			Point t = queue.poll();
+			
+			 // 현 좌표가 1보다 크다면 부딪혀있는것. & 이동안한것 거르기.
+			if(visited[t.r][t.c][t.rep]>1) {
+				if(t.r > arrM[t.r][t.c]) {
+					arrN[t.r][t.c] += t.cnt;
+                    arrD[t.r][t.c] = t.dir;
+                    arrM[t.r][t.c] = t.cnt;
+				}else arrN[t.r][t.c] += t.cnt;
+				visited[t.r][t.c][t.rep]--;
+				continue;
+			}else {
 				
-				int nr = p.r + dr[p.dir];
-				int nc = p.c + dc[p.dir];
-				int nCnt = p.cnt;
-				int nDir = p.dir;
-				
-				if(nr == 0 || nc == 0 || nr == N-1 || nc == N-1) { //가장자리, 약품이 발라진 곳이면
-					nDir = (nDir + 2) % 4; // 1 <-> 3 , 0 <-> 2 
-					nCnt /= 2;
-					if(nCnt == 0) continue;
-				}
-				
-				boolean isOk = false;
-				for(int k = 0; k < newList.size(); k++) { //같은 자리에 이미 군집이 있는지 확인
-					Point temp = newList.get(k);
-					if(temp.r == nr && temp.c == nc) {
-						isOk = true;
-						if(temp.cnt < nCnt) {
-							newList.get(k).dir = (temp.dir + 2) % 4;
-						}
-						newList.get(k).cnt += nCnt;
-					}
-				}
-				
-				if(!isOk) {
-				newList.add(new Point(nr, nc, nCnt, nDir));
-				list = newList;
-				newList.clear();
-				}
 			}
 		}
-		
 	}
 	
 	static int getCount() {
 		int cnt = 0;
+		for(int i = 0; i < list.size(); i++) {
+			cnt += list.get(i).cnt;
+		}
+		
 		return cnt;
 	}
 	
 	static class Point{
-		int r, c, cnt, dir;
-		Point(int r, int c, int cnt, int dir){
+		int r, c, cnt, dir, rep;
+		Point(int r, int c, int cnt, int dir, int rep){
 			this.r = r;
 			this.c = c;
 			this.cnt = cnt;
 			this.dir = dir;
+			this.rep = rep;
+		}
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return "r : "+r+" c : "+c+" cnt : "+cnt+" dir : "+dir;
 		}
 	}
 	
