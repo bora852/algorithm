@@ -1,41 +1,33 @@
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
-public class Solution2 {
+public class Solutions {
 	static int N, M, K, R, C, cnt, dir;
-	static Point[][] map;
-	static ArrayList<Point> list;
-	static int[][][] visited;
-    static int[][] arrM,arrN,arrD;
+	static int[][] map, cheif;
+	static Point[] micro;
 	static int[] dr = {0, -1, 1, 0, 0}; // (상: 1, 하: 2, 좌: 3, 우: 4)
 	static int[] dc = {0, 0, 0, -1, 1};
+	static int conv[] = { 0, 2,1,4,3 };
 	public static void main(String[] args) {
 		//Scanner sc = new Scanner(System.in);
 		Scanner sc = new Scanner(src);
 		int T = sc.nextInt();
 		
 		for(int tc = 1; tc <= T; tc++) {
-			visited = new int[100][100][1001];
-	        arrN = new int[100][100];
-	        arrD = new int[100][100];
-	        arrM = new int[100][100];
-	        
+			
 			N = sc.nextInt(); //셀의 개수
 			M = sc.nextInt(); //격리 시간
 			K = sc.nextInt(); //미생물 군집수
-			
-			list = new ArrayList<>();
-			//map = new Point[N][N];
-			
+			micro = new Point[K];
+			map = new int[N][N]; 	//미생물 군집에서 대표값.
+			cheif = new int[N][N]; 	//미생물 군집의 대표의 idx
 			for(int i = 0; i < K; i++) {
 			//세로 위치, 가로 위치, 미생물 수, 이동 방향
 				R = sc.nextInt();
 				C = sc.nextInt();
 				cnt = sc.nextInt();
 				dir = sc.nextInt();
-				list.add(new Point(R, C, cnt, dir, 0));
+				micro[i] = new Point(R, C, cnt, dir);
 			}
 			
 			solve();
@@ -45,41 +37,68 @@ public class Solution2 {
 	
 	static ArrayList<Point> newList; 
 	static void solve() {
-		Queue<Point> queue = new LinkedList<>();
-		
-		for(int i=0; i<K; i++) {
-            queue.add(list.get(i));
-            visited[list.get(i).r][list.get(i).c][0]++;
-        }
-		int result = 0;
-		while(!queue.isEmpty()) {
-			Point t = queue.poll();
+
+		//격리 시간만큼 
+		while(M-- > 0) {
 			
-			 // 현 좌표가 1보다 크다면 부딪혀있는것. & 이동안한것 거르기.
-			if(visited[t.r][t.c][t.rep]>1) {
-				if(t.r > arrM[t.r][t.c]) {
-					arrN[t.r][t.c] += t.cnt;
-                    arrD[t.r][t.c] = t.dir;
-                    arrM[t.r][t.c] = t.cnt;
-				}else arrN[t.r][t.c] += t.cnt;
-				visited[t.r][t.c][t.rep]--;
-				continue;
-			}else {
+			//맵초기화
+			map = new int[N][N];
+			cheif = new int[N][N];
+			
+			for(int i = 0; i < micro.length; i++) {
+				Point p = micro[i];
 				
+				if(p.cnt == 0) {
+					continue;		
+				}
+				
+				//방향대로 이동
+				p.r += dr[p.dir];
+				p.c += dc[p.dir];
+				
+				//약품이 칠해진 곳으로 갔는지 확인.
+				//절반이 죽고, 이동방향이 반대로 바뀐다.
+				//미생물이 0이 되어버리면 ---> remove or 그냥 0넣어두기
+				if(p.r == 0 || p.r == N-1 || p.c == 0 || p.c == N-1) {
+					p.dir = conv[p.dir];
+					p.cnt /= 2;
+				}
+				
+				//이동 후의 map에 0초과의 값이 있으면 값을 비교해서 대표와 방향을 정하기
+				if(map[p.r][p.c] > 0) {
+					int idx = cheif[p.r][p.c];
+					
+					micro[idx].cnt += p.cnt;
+					
+					if(map[p.r][p.c] < p.cnt) {
+						map[p.r][p.c] = p.cnt;
+						micro[idx].dir = p.dir;
+					}
+					
+					p.cnt = 0;
+				}else {
+					map[p.r][p.c] = p.cnt;
+					cheif[p.r][p.c] = i;
+				}
 			}
 		}
 	}
 	
-
+	static int getCount() {
+		int cnt = 0;
+		for(int i = 0; i < micro.length; i++) {
+			cnt += micro[i].cnt;
+		}
+		return cnt;
+	}
 	
 	static class Point{
-		int r, c, cnt, dir, rep;
-		Point(int r, int c, int cnt, int dir, int rep){
+		int r, c, cnt, dir;
+		Point(int r, int c, int cnt, int dir){
 			this.r = r;
 			this.c = c;
 			this.cnt = cnt;
 			this.dir = dir;
-			this.rep = rep;
 		}
 		@Override
 		public String toString() {
