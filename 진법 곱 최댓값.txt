@@ -1,0 +1,54 @@
+import java.util.Arrays;
+
+class Solution_11 {
+	
+	public static void main(String[] args) {
+		Solution_11 sol = new Solution_11();
+		int N = 14;
+		System.out.println(Arrays.toString(sol.solution(N)));
+	}
+	
+    public int[] solution(int N) {
+        int[] answer = new int[2];
+        String[] temp = new String[10];
+        for(int i = 2; i < 10; i++) {
+        	String str = toDeposition(N, i);
+        	temp[i] = str;
+        }
+        
+//        System.out.println(Arrays.toString(temp));
+        
+        for(int i = 2; i < temp.length; i++) {
+        	int max = 1;
+        	String word = temp[i];
+        	for(int j = 0; j < word.length(); j++) {
+        		max *= word.charAt(j) - '0';
+        		if(max == 0) {
+        			break;
+        		}
+        	}
+        	if(max >= answer[1]) {
+        		answer[1] = max;
+        		answer[0] = i;
+        	}
+        }
+//        System.out.println(Arrays.toString(answer));
+        return answer;
+    }
+    
+    public static String toDeposition(int value, int i){
+
+        String returnString = "";
+
+        while(value != 0){
+            // 나머지가 0~9 사이이면  캐릭터 값을 배열에 저장
+            if( (value % i) < 10 ) { //14
+                //문자열 우->좌로 배열
+                returnString = (value % i) + returnString;
+                //몫을 구함
+                value /= i;
+            }
+        }
+        return returnString;
+    }
+}
