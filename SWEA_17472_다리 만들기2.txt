@@ -1,55 +1,128 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
 public class Main {
-	//2 ≤ 섬의 개수 ≤ 6
-	//1 ≤ N, M ≤ 10
 	
-	static int N, M, ans, islandCnt;
+	static int N, M, ans, islandCnt;	//맵, 섬 번호, 최단거리 dist[a][b] = c
 	static int[][] map, label, dist;
 	static boolean[][] visit;
-	static boolean[] connect; 			//연결관계 체크를 위한 배열??
-	static boolean[] connectIsland;		//섬끼리 연결되어 있는지, bfs탐색시, 방문체크를 위한 배열
+	static boolean[][] connect; 		//연결관계 체크를 위한 배열
+	static boolean[] connectIsland;		//섬끼리 연결되어 있는지 -> bfs탐색시, 방문체크를 위한 배열
 	static boolean[] select;			//조합 추출에서 중복을 막기 위한 배열
 	
 	static ArrayList<Point> list; 		//입력시 모든 섬의 좌표를 저장
-	static Point[][] area_pos; 	//각 섬에 존재하는 땅의 좌표 저장
-	static ArrayList<ArrayList<Point>> bridgeList;
+	static Point[][] area_pos; 			//각 섬에 존재하는 땅의 좌표 저장
+	static ArrayList<Point> bridgeList;	//다리 길이와, 이 다리가 어떤 섬을 연결하는지 저장
 	
 	static int[] dr = {-1, 1, 0, 0};
 	static int[] dc = {0, 0, -1, 1};
 	
-	static final int INF = 999;
+	static final int INF = 1000;
+	static final int ISLAND_MAX = 6 + 1;
+	static final int MAX = 10;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception{
 //		Scanner sc = new Scanner(System.in);
 		Scanner sc = new Scanner(src);
 		
-		N = sc.nextInt();
-		M = sc.nextInt();
-		map = new int[N][M];
-		dist = new int[N][M];
-		label = new int[N][M];
-		visit = new boolean[N][M];
+		//1 ≤ N, M ≤ 10, 3 ≤ N×M ≤ 100
+		N = sc.nextInt(); //세로, 행
+		M = sc.nextInt(); //가로, 열
+		
+		map = new int[MAX][MAX];
+		label = new int[MAX][MAX];
+		
+		dist = new int[ISLAND_MAX][ISLAND_MAX];
+		
+		visit = new boolean[MAX][MAX];
+		connect = new boolean[ISLAND_MAX][ISLAND_MAX];
+		connectIsland = new boolean[ISLAND_MAX];
+		select = new boolean[ISLAND_MAX * ISLAND_MAX];
 		
 		list = new ArrayList<>();
-		area_pos = new Point[7][];
-		bridgeList = new ArrayList<ArrayList<Point>>();
+		area_pos = new Point[ISLAND_MAX][101];
+		bridgeList = new ArrayList<>();
+		
+		for (int i = 0; i < 7; i++){
+	        for (int j = 0; j < 7; j++){
+	        	dist[i][j] = INF;
+	        }
+	    }
 		
 		for(int i = 0; i < N; i++) {
 			for(int j = 0; j < M; j++) {
-				dist[i][j] = INF;
 				map[i][j] = sc.nextInt();
 				if(map[i][j] == 1) list.add(new Point(i, j)); 
 			}
 		}
 		
+		ans = INF;
 		makeLabel(); 	//섬의 번호를 붙이는 메서드
 		findDistance(); //섬끼리 최단거리 구하기
+		distDfs(0, 0, 0); //정답
+		if(ans == INF) ans = -1;
+		System.out.println(ans);
 	}
 	
+	static void distDfs(int idx, int cnt, int sum) {
+		/*
+		 * 조합 구현을 통해서 정답을 도출하기 위한 메서드.
+		 */
+		if(cnt >= 1) { //1개이상만 뽑았으면 무조건 확인
+			if(checkState()) {
+				if(ans > sum) ans = sum;
+			}
+		}
+		
+		for(int i = idx; i < bridgeList.size(); i++) {
+			if(select[i]) continue;
+			select[i] = true;
+			distDfs(i, cnt + 1, sum + bridgeList.get(i).dis);
+			select[i] = false;
+		}
+	}
+	
+	static boolean checkState() {
+		connect = new boolean[N][M]; 		//연결관계 체크를 위한 배열
+		connectIsland = new boolean[islandCnt]; //연결관계를 통해, 정답을 도출하기 위한 BFS탐색 시 사용
+		for(int i = 0; i < bridgeList.size(); i++) {
+			if(select[i]) {
+				int r = bridgeList.get(i).r;
+				int c = bridgeList.get(i).c;
+				connect[r][c] = true;
+				connect[c][r] = true;
+			}
+		}
+		
+		Queue<Integer> q = new LinkedList<>();
+		q.add(1);
+		connectIsland[1] = true;
+		
+		int islandCount = 1;
+		boolean flag = false;
+		while(!q.isEmpty()) {
+			int cur = q.poll();
+			if(islandCount == islandCnt-1) {
+				flag = true;
+				break;
+			}
+			
+			for(int i = 1; i < islandCnt; i++) {
+				if(cur == i) continue;
+				if(connect[cur][i] && !connectIsland[i]) {
+					connectIsland[i] = true;
+					q.add(i);
+					islandCount++;
+				}
+			}
+		}
+		return flag;
+	}
+	 
 	static void findDistance() {
 		/*
 		 * 섬들간의 최단거리를 구하는 메서드
@@ -59,6 +132,7 @@ public class Main {
 			for(int j = i + 1; j < islandCnt; j++) {
 				makeBridge(i, j);
 				if(dist[i][j] == INF)continue;
+				bridgeList.add(new Point(i, j, dist[i][j]));
 			}
 		}
 	}
@@ -68,6 +142,7 @@ public class Main {
 		 * 시작 섬에 존재하는 모든 땅들에서 도착섬까지 탐색해본다.
 		 */
 		for(int i = 0; i < area_pos[srt].length; i++) {
+			if(area_pos[srt][i] == null) continue;
 			int r = area_pos[srt][i].r;
 			int c = area_pos[srt][i].c;
 			
@@ -107,9 +182,9 @@ public class Main {
 		int labelNum = 1;
 		for(int i = 0; i < list.size(); i++) {
 			Point p = list.get(i);
-			if(!visit[p.r][p.c]) bfs(p.r, p.c, labelNum);
+			if(!visit[p.r][p.c]) bfs(p.r, p.c, labelNum++);
 		}
-		islandCnt = labelNum;
+		islandCnt = labelNum; //섬의 최종적인 갯수 = islandCnt-1
 	}
 	
 	static void bfs(int r, int c, int num) {
@@ -131,7 +206,6 @@ public class Main {
 					q.add(new Point(nr, nc));
 					area_pos[num][cnt++] = new Point(nr, nc);
 				}
-				
 			}
 		}
 	}
@@ -141,10 +215,14 @@ public class Main {
 	}
 	
 	static class Point{
-		int r, c;
+		int r, c, dis;
 		Point(int r, int c){
 			this.r = r;
 			this.c = c;
+		}
+		Point(int r, int c, int dis){
+			this(r, c);
+			this.dis = dis;
 		}
 	}
 	static String src = "7 8\r\n" + 
