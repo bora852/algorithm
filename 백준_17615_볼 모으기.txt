@@ -10,16 +10,7 @@ public class Main {
 		int Rcnt = 0;
 		int Bcnt = 0;
 		int ans = 0;
-		for(int i = 0; i < N - 1; i++) {
-			if(str.charAt(i) == str.charAt(i + 1)) {
-				cnt++;
-			}else if(str.charAt(i) != str.charAt(i + 1)){
-				ans += cnt;
-				if(str.charAt(i) == 'R') Rcnt += cnt;
-				else Bcnt += cnt;
-				cnt = 1;
-			}
-		}
+		
 		System.out.println(Rcnt + " " + Bcnt);
 		System.out.println(ans = (Rcnt < Bcnt) ? Rcnt : Bcnt);
 	}
