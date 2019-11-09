@@ -1,0 +1,74 @@
+package other;
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+   static int N, ans;
+   static int[][] map;
+   public static void main(String[] args) {
+      Scanner sc = new Scanner(System.in);
+      N = sc.nextInt();
+      map = new int[N][N];
+      for(int i = 0; i < N; i++) {
+         for(int j = 0; j < N; j++) {
+            map[i][j] = sc.nextInt();
+         }
+      }
+      ans = 987654321;
+      flower = new int[N][N];
+      dfs(0, 1, 0);
+      System.out.println(ans);
+   }
+   
+   static int[][] flower;
+   static int min;
+   static int[] dr = {-1, 1, 0, 0};
+   static int[] dc = {0, 0, -1, 1};
+   static void dfs(int cnt, int row, int sum) {
+      if(cnt == 3) {
+          if(ans > sum) ans = sum;
+          return;
+      }
+      
+      for(int i = row; i < N-1; i++) {
+          for(int j = 1; j < N-1; j++) {
+         	 if(flower[i][j] != 9) {
+         		 //주변검사.
+         		 boolean chk = isRange(i, j);
+         		 if(chk) {
+         			 int tmp = 0;
+	         		 flower[i][j] = 9;
+	         		 //씨앗자리와 상하좌우 자리를 sum에 더하고
+	         		 tmp += map[i][j];
+	         		for(int k = 0; k < 4; k++) {
+	         		   int nr = i + dr[k];
+	         		   int nc = j + dc[k];
+	         		   flower[nr][nc] = 9;
+	         		   tmp += map[nr][nc];
+	         		}  
+	         		 dfs(cnt + 1, i, sum + tmp);
+	         		 flower[i][j] = 0;
+	         		 //9 삭제, 내 상하좌우만
+	         		for(int k = 0; k < 4; k++) {
+		         		   int nr = i + dr[k];
+		         		   int nc = j + dc[k];
+		         		  flower[nr][nc] = 0;
+		         	}  
+         		 }
+         	 }
+          }
+       }
+   }
+   
+   //주변검사
+   static boolean isRange(int r, int c) {
+	   for(int k = 0; k < 4; k++) {
+		   int nr = r + dr[k];
+		   int nc = c + dc[k];
+		   if(flower[nr][nc] == 9) 
+			   return false;
+	   }
+	   return true;
+   }
+}
