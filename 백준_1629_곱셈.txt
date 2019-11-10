@@ -1,0 +1,24 @@
+//https://www.acmicpc.net/problem/1629
+//분할정복
+
+import java.util.Scanner;
+
+public class Main {
+	static long A, B, C;
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		A = sc.nextLong();
+		B = sc.nextLong();
+		C = sc.nextLong();
+		
+		System.out.println(mul(B));
+	}
+	static long mul(long b) {
+		if(b == 0) return 1;
+		
+		long tmp = mul(b/2);
+		tmp = tmp * tmp % C;
+		if(b%2 == 0) return tmp;
+		else return tmp * A % C;
+	}
+}
