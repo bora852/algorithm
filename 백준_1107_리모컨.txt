@@ -1,0 +1,71 @@
+package other;
+
+import java.util.Scanner;
+
+public class Main {
+	static int N, M, ans;
+	static boolean[] button;
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		N = sc.nextInt(); //이동하려는 채널
+		M = sc.nextInt(); //고장난 버튼
+		button = new boolean[10];
+		for(int i = 0; i < M; i++) {
+			button[sc.nextInt()] = true;
+		}
+		
+		//이동하려는 채널로 갈 수 있는 방법
+		//1.버튼 클릭으로만 이동할 수 있는지
+		//2.가까운 채널에서 -, + 버튼을 눌러서 이동할 수 있는지, --> 0~1000000까지 다 눌러보기
+		//3.처음주어진 100번 채널에서 -,+버튼을 눌러서 이동할 수 있는지
+		
+		ans = 987654321;
+		int minNum = 0;
+		//1.버튼 클릭으로만 이동할 수 있는지
+		//2.가까운 채널에서 -, + 버튼을 눌러서 이동할 수 있는지, --> 0~1000000까지 다 눌러보기
+		for(int i = 0; i <= 1000000; i++) {
+			if(canPress(i)) { //누를 수 있다면
+				int min = (int)Math.abs(i - N);
+				if(ans > min) {
+					ans = min;
+					minNum = i;
+				}
+			}
+		}
+		
+		int cnt = 1;
+		while(minNum >= 10) {
+			minNum /= 10;
+			cnt++;
+		}
+		
+		int buttonNum = (int)Math.abs(100 - N); //3.
+		ans = ans + cnt;
+		//이동할 수 있다면, 눌러야하는 버튼의 개수를 출력하고 종료
+		System.out.println(ans = buttonNum > ans ? ans : buttonNum);
+	}
+	
+	static boolean canPress(int num) {
+		boolean flag = true;
+		if(num == 0) {
+			return !button[num];
+		}
+		
+		while(num > 0) {
+			if(button[(num % 10)]) {
+				flag = false;
+				break;
+			}
+			num /= 10;
+		}
+		return flag;
+	}
+}
+
+//in:
+//101
+//3
+//4 5 6
+//
+//out:
+//1
