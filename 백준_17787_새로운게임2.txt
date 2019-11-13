@@ -4,16 +4,6 @@ import java.util.Scanner;
 
 public class Main {
 	
-	static String src = "4 4\r\n" + 
-			"0 0 2 0\r\n" + 
-			"0 0 1 0\r\n" + 
-			"0 0 1 2\r\n" + 
-			"0 2 0 0\r\n" + 
-			"2 1 1\r\n" + 
-			"3 2 3\r\n" + 
-			"2 2 1\r\n" + 
-			"4 1 2";
-	
 	static int N, K, ans;
 	static int[][] map, rep;
 	static int[] dr = {0, 0, 0, -1, 1};	//오른쪽, 왼쪽, 위, 아래 
@@ -21,7 +11,6 @@ public class Main {
 	static Point[] point; 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
-//		Scanner sc = new Scanner(src);
 		N = sc.nextInt(); 		//체스판 크기
 		K = sc.nextInt(); 		//말의개수
 		map = new int[N + 2][N + 2];	
@@ -56,19 +45,13 @@ public class Main {
 			//System.out.println(point[i]);
 		}
 		
-//		for(int tmp[] : rep) {
-//			System.out.println(Arrays.toString(tmp));
-//		}
-//		System.out.println("-----------------------------");
-		
 		ans = -1;
 		
 		//0은 흰색, 1은 빨간색, 2는 파란색
 		boolean isEnd = true;
-		int time = 0;
+		int time = 1;
 		
 		outer : while(true) {
-			System.out.println("---------------------------------");
 			//1턴 - 순서대로 말이 이동
 			for(int idx = 1; idx <= K; idx++) {
 				Point p = point[idx]; 
@@ -108,60 +91,42 @@ public class Main {
 						 updateRep(p, point[rep[new_r][new_c]]);
 					 }
 				 }else if(map[new_r][new_c] == 1) { //빨강
-					 System.out.println("빨강으로 온 " + idx);
 					 int cnt = point[repNo].cnt;
-					 if(cnt > 1 && repNo != p.no) {
+					 if(repNo != p.no) { 
 						 reverse(p, cnt, p.cnt); //뒤집기
 					 }
 					 if(rep[new_r][new_c] > 0) {
-						 updateRep(point[repNo], point[rep[new_r][new_c]]);
+						 updateRep(point[repNo], point[rep[new_r][new_c]]); //순서가 바뀌니까
 					 }
 					 repNo = p.no;
+						
 				 }
 								
 				 //대표를 바꿔준다.
 				 rep[new_r][new_c] = repNo;
-				 
-				//////////////////////////////
-				System.out.println("turn 중의 "+idx+" 번째 끝");
-				for(int tmp[] : rep) {
-					System.out.println(Arrays.toString(tmp));
-				}
-				System.out.println();
-				///////////////////////////// 
-			}
-			
-			time++;
-			
-			for(int i = 1; i <= K; i++) {
-				System.out.println(point[i]);
+				 if(point[repNo].cnt >= 4) break outer;
 			}
 			
 			
-			//턴이 끝나고 나서 구해야되나???????? 이 부분이 헷갈림
-				// yes -> 맵을 전부 돌면서 cnt가 4인 애가 있으면 끝.
-				// no -> 대표 바꿔줄때, 4인지 확인해서 있으면 끝.
-			for(int r = 1; r < N + 2; r++) {
-				for(int c = 1; c < N + 2; c++) {
-					if(rep[r][c] > 0) {
-						if(point[rep[r][c]].cnt >= 4) {
-							break outer;
-						}
-					}
-				}
-			}
-		
-//			//////////////////////////////
+			
+			//////////////////////////////
+//			System.out.println("@@@@@@@@@@턴끝@@@@@@@@@@");
+//			for(int i = 1; i <= K; i++) {
+//				System.out.println(point[i]);
+//			}
 //			for(int tmp[] : rep) {
 //				System.out.println(Arrays.toString(tmp));
 //			}
+//			System.out.println("@@@@@@@@@@@@@@@@@@@@");
 //			System.out.println();
-//			/////////////////////////////
+			/////////////////////////////
 			
-			if(time > 1000) {
+			if(time >= 1000) {
 				isEnd = false;
 				break outer;
 			}
+			time++;
+			
 		}
 		
 		if(isEnd) {
@@ -172,36 +137,20 @@ public class Main {
 	//#뒤집는 함수
 	static void reverse(Point p, int rep_cnt, int p_cnt) {
 		int cnt = rep_cnt - p_cnt + 1;
-		//System.out.println("cnt : "+rep_cnt+" "+p_cnt);
 		int[] store = new int[cnt];
 		int no = p.no;
 		for(int i = 0; i < cnt; i++) {
 			store[i] = no;
 			no = point[no].up;
 		}
-		System.out.println("store : "+Arrays.toString(store));
 		
-		int idx = cnt/2;
-		for(int i = 0; i < idx; i++) {
-			System.out.println("바꾼다 "+point[store[i]].no+" "+point[store[cnt - i - 1]].no);
-			int tmpUp = point[store[i]].up;
-			int tmpDown = point[store[i]].down;
-			int tmpCnt = point[store[i]].cnt;
-			point[store[i]].up = point[store[cnt - i - 1]].up;
-			point[store[i]].down = point[store[cnt - i - 1]].down;
-			point[store[i]].cnt = point[store[cnt - i - 1]].cnt;
-			point[store[cnt - i - 1]].up = tmpUp;
-			point[store[cnt - i - 1]].down = tmpDown;
-			point[store[cnt - i - 1]].cnt = tmpCnt;
+		int srt_cnt = p.cnt;
+		for(int i = 0; i < cnt; i++) {
+			int tmpUp = point[store[cnt - i - 1]].up;
+			point[store[cnt - i - 1]].up = point[store[cnt - i - 1]].down;
+			point[store[cnt - i - 1]].down = tmpUp;
+			point[store[cnt - i - 1]].cnt = srt_cnt++;
 		}
-		
-		//홀수라면 가운데 있는 말 up, down을 바꿔줘야함
-		if(cnt % 2 != 0) {
-			int tmpUp = point[idx].up;
-			point[idx].up =  point[idx].down;
-			point[idx].down = tmpUp;
-		}
-		
 	}
 	//#이동시 원래 대표 수정함수
 	static void updateRep(Point new_p, Point old_p) {
@@ -223,7 +172,8 @@ public class Main {
 			while(true) {
 				sel.r = nr;
 				sel.c = nc;
-				sel.cnt = cnt++ + 1;
+				sel.cnt = cnt + 1;
+				cnt++;
 				up = sel.up;
 				if(up > 0) sel = point[up];
 				else break;
