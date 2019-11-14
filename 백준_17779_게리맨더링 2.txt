@@ -1,0 +1,112 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+	static int[][] popul;
+	static int[][] area;
+	static int N, ans;
+	static int[] people;
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		N = sc.nextInt();
+		popul = new int[N][N]; //인구수 담은 배열
+		area = new int[N][N]; //구역을 나눌 배열
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				popul[i][j] = sc.nextInt();
+			}
+		}
+		
+		ans = 987654321;
+		
+		//좌표마다 
+		for(int i = 0; i < N - 2; i++) {
+			for(int j = 1; j < N - 1; j++) {
+				for(int d1 = 1; d1 <= j; d1++) {
+					for(int d2 = 1; d2 < N - j; d2++) {
+						//경계선을 그릴 수 있는지 확인
+						if(boundary(i, j, d1, d2)) {
+							//구역나누기
+							divide(i, j, d1, d2);
+						}
+					}
+				}
+				
+			}
+		}
+		
+		System.out.println(ans);
+	}
+	
+	static void divide(int r, int c, int d1, int d2) {
+		
+		//전부 5구역으로 setting
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				area[i][j] = 5;
+			}
+		}
+		
+		//1선거구
+		int tmp = 0;  
+		for(int i = 0; i < r + d1; i++) {
+			if(i >= r) tmp++;
+			for(int j = 0; j <= c - tmp; j++) {
+				area[i][j] = 1;
+			}
+		}
+		
+		//2선거구
+		tmp = 0;  
+		for(int i = 0; i <= r + d2; i++) {
+			if(i > r) tmp++;
+			for(int j = N-1; j > c + tmp; j--) {
+				area[i][j] = 2;
+			}
+		}
+		
+		//3선거구
+		tmp = 0;  
+		for(int i = N-1; i >= r + d1; i--) {
+			if(i < r + d1 + d2) tmp++;
+			for(int j = 0; j < c - d1 + d2 - tmp; j++) {
+				area[i][j] = 3;
+			}
+		}
+		
+		//if) r = 1, c = 3, d1 = 2, d2 = 2
+		//4선거구
+		tmp = 0;
+		for(int i = N-1; i > r + d2; i--) {
+			if(i <= r + d1 + d2 ) tmp++;
+			for(int j = N-1; j >= c - d1 + d2 + tmp; j--) {
+				area[i][j] = 4;
+			}
+		}
+		
+		///////////////////////////////////////////////
+//		System.out.println( r + " " + c + " " + d1 + " " + d2);
+//		for(int[] a : area)
+//			System.out.println(Arrays.toString(a));
+//		System.out.println();
+		
+		people = new int[6];
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				people[area[i][j]] = people[area[i][j]] + popul[i][j];
+			}
+		}
+		
+		Arrays.sort(people);
+		int min = people[5] - people[1];
+		if(ans > min) ans = min;
+	}
+	
+	static boolean boundary(int r, int c, int d1, int d2) {
+		if(r + d1 >= N || c - d1 < 0) return false;
+		if(r + d2 >= N || c + d2 >= N) return false;
+		if(r + d1 + d2 >= N || c - d1 + d2 >= N) return false;
+		if(r + d2 + d1 >= N || c + d2 - d1 < 0) return false;
+		return true;
+	}
+}

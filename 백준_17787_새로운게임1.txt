@@ -1,0 +1,224 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+
+public class Main {
+	
+	static int N, K, ans;
+	static int[][] map, rep;
+	static int[] dr = {0, 0, 0, -1, 1};	//오른쪽, 왼쪽, 위, 아래 
+	static int[] dc = {0, 1, -1, 0, 0}; //-> , <- , ..
+	static Point[] point; 
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		N = sc.nextInt(); 		//체스판 크기
+		K = sc.nextInt(); 		//말의개수
+		map = new int[N + 2][N + 2];	
+		rep = new int[N + 2][N + 2];	//맨위에 말을 놓는 맵
+		point = new Point[K + 1];
+		
+		for(int i = 1; i < N + 1; i++) {
+			for(int j = 1; j < N + 1; j++) {
+				map[i][j] = sc.nextInt();
+			}
+		}
+		
+		//외곽을 다 파랑색(2)로 세팅 
+		for(int i = 0; i < N + 2; i++) {
+			for(int j = 0; j < N + 2; j++) {
+				if(i == 0 || j == 0 || i == N + 1 || j ==  N + 1) {
+					map[i][j] = 2;
+				}
+			}
+		}
+		
+//		for(int tmp[] : map) {
+//			System.out.println(Arrays.toString(tmp));
+//		}
+		
+		for(int i = 1; i <= K; i++) {
+			int r = sc.nextInt();
+			int c = sc.nextInt();
+			int dir = sc.nextInt();
+			point[i] = new Point(i, r, c, dir, 0, 0, 1);
+			rep[r][c] = i;
+			//System.out.println(point[i]);
+		}
+		
+		ans = -1;
+		
+		//0은 흰색, 1은 빨간색, 2는 파란색
+		boolean isEnd = true;
+		int time = 1;
+		
+		outer : while(true) {
+			//1턴 - 순서대로 말이 이동
+			for(int idx = 1; idx <= K; idx++) {
+				Point p = point[idx]; 
+				 int ori_r = p.r; 
+				 int ori_c = p.c;
+				 int new_r = p.r + dr[p.dir];
+				 int new_c = p.c + dc[p.dir];
+				 
+				 if(p.down != 0) continue;
+				 
+				if(map[new_r][new_c] == 2) { //파랑이면
+					updateDir(p); //방향바꾸기
+					new_r = ori_r + dr[p.dir];
+					new_c = ori_c + dc[p.dir];
+					
+					if(map[new_r][new_c] == 2) { //또 파랑이면, 방향만 바꾸고 끝
+						continue;
+					}
+				}
+				 
+				//내가  down이 있으면, 대표맵에 대표를 down으로 바꿔주고 down버리기
+				 if(p.down > 0) {
+					 Point before = point[p.down];
+					 before.up = 0;
+					 rep[ori_r][ori_c] = p.down;
+					 p.down = 0;
+				 }else rep[ori_r][ori_c] = 0;
+				
+				 //좌표이동은 공통 작업(좌표이동, cnt수정)
+				 int tmpCnt = 0;
+				 if(rep[new_r][new_c] > 0) {
+					 tmpCnt = point[rep[new_r][new_c]].cnt;
+				 }
+				 int repNo = move(p, new_r, new_c, tmpCnt);
+				 
+				 //내가 새로 갈 곳의 바닥의 색이
+				 if(map[new_r][new_c] == 0) { //흰색
+					 if(rep[new_r][new_c] > 0) {
+						 updateRep(p, point[rep[new_r][new_c]]);
+					 }
+				 }else if(map[new_r][new_c] == 1) { //빨강
+					 int cnt = point[repNo].cnt;
+					 if(repNo != p.no) { 
+						 reverse(p, cnt, p.cnt); //뒤집기
+					 }
+					 if(rep[new_r][new_c] > 0) {
+						 updateRep(point[repNo], point[rep[new_r][new_c]]); //순서가 바뀌니까
+					 }
+					 repNo = p.no;
+						
+				 }
+								
+				 //대표를 바꿔준다.
+				 rep[new_r][new_c] = repNo;
+				 if(point[repNo].cnt >= 4) break outer;
+			}
+			
+			
+			
+			//////////////////////////////
+//			System.out.println("@@@@@@@@@@턴끝@@@@@@@@@@");
+//			for(int i = 1; i <= K; i++) {
+//				System.out.println(point[i]);
+//			}
+//			for(int tmp[] : rep) {
+//				System.out.println(Arrays.toString(tmp));
+//			}
+//			System.out.println("@@@@@@@@@@@@@@@@@@@@");
+//			System.out.println();
+			/////////////////////////////
+			
+			if(time >= 1000) {
+				isEnd = false;
+				break outer;
+			}
+			time++;
+			
+		}
+		
+		if(isEnd) {
+			ans = time;
+		}
+		System.out.println(ans);
+	}
+	//#뒤집는 함수
+	static void reverse(Point p, int rep_cnt, int p_cnt) {
+		int cnt = rep_cnt - p_cnt + 1;
+		int[] store = new int[cnt];
+		int no = p.no;
+		for(int i = 0; i < cnt; i++) {
+			store[i] = no;
+			no = point[no].up;
+		}
+		
+		int srt_cnt = p.cnt;
+		for(int i = 0; i < cnt; i++) {
+			int tmpUp = point[store[cnt - i - 1]].up;
+			point[store[cnt - i - 1]].up = point[store[cnt - i - 1]].down;
+			point[store[cnt - i - 1]].down = tmpUp;
+			point[store[cnt - i - 1]].cnt = srt_cnt++;
+		}
+	}
+	//#이동시 원래 대표 수정함수
+	static void updateRep(Point new_p, Point old_p) {
+		old_p.up = new_p.no;
+		new_p.down = old_p.no;
+	}
+	//#좌표이동함수(등위에 타고 있는 말까지 한꺼번에 좌표를 바꿔줌, cnt도 바꿔주기), return값을 대표로 놓을 말
+	static int move(Point p, int nr, int nc, int cnt) {
+		p.r = nr;
+		p.c = nc;
+		p.cnt = cnt + 1;
+		int up = p.up;
+		
+		if(up == 0) return p.no;
+		
+		Point sel = point[up];
+		if(up > 0) {
+			cnt++;
+			while(true) {
+				sel.r = nr;
+				sel.c = nc;
+				sel.cnt = cnt + 1;
+				cnt++;
+				up = sel.up;
+				if(up > 0) sel = point[up];
+				else break;
+			}
+		}
+		return sel.no;
+	}
+	
+	//#방향바꾸기 함수(나,내방향)
+	static void updateDir(Point p) {
+		switch(p.dir) {
+		case 1:
+			p.dir = 2;
+			break;
+		case 2:
+			p.dir = 1;
+			break;
+		case 3:
+			p.dir = 4;
+			break;
+		case 4:
+			p.dir = 3;
+			break;
+		}
+	}
+	
+	//번호, 행, 열, 이동방향, up, down 
+	static class Point{
+		int no, r, c, dir, up, down, cnt;
+		Point(int no, int r, int c, int dir, int up, int down, int cnt){
+			this.no = no;
+			this.r = r;
+			this.c = c;
+			this.dir = dir;
+			this.up = up;
+			this.down = down;
+			this.cnt = cnt;
+		}
+		@Override
+		public String toString() {
+			return "Point [no=" + no + ", r=" + r + ", c=" + c + ", dir=" + dir + ", up=" + up + ", down=" + down + ", cnt=" + cnt+"]";
+		}
+	}
+	
+	
+}
