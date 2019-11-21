@@ -1,0 +1,42 @@
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();	//다리를 건너는 트럭의 수
+		int w = sc.nextInt();	//다리의 길이
+		int L = sc.nextInt();	//다리의 최대하중
+		int[] arr = new int[w];
+		Queue<Integer> q = new LinkedList<>();
+		for(int i = 0; i < n; i++) {
+			q.add(sc.nextInt());
+		}
+		
+		int time = 0;
+		int length = 0;
+		int weight = 0;
+		int tmpW = 0;
+		while(!q.isEmpty()) {
+			
+			weight -= arr[0];
+			for(int i = 0; i < arr.length - 1; i++) {
+				arr[i] = arr[i+1];
+			}
+			arr[arr.length-1] = 0;
+			
+			
+			tmpW = q.peek() + weight;
+			if(L >= tmpW) {
+				tmpW = q.poll();
+				 weight += tmpW;
+				 arr[arr.length-1] = tmpW;
+			}
+//			System.out.println(Arrays.toString(arr));
+			time++;
+		}
+		System.out.println(time+=w);
+	}
+}
