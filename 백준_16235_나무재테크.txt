@@ -1,6 +1,5 @@
 package other;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -13,7 +12,7 @@ public class Main {
 	static int[][] map, A;
 	static int[] dr = {-1, 1, 0, 0, -1, -1, 1, 1};
 	static int[] dc = {0, 0, -1, 1, -1, 1, -1, 1};
-	static PriorityQueue<Tree>[][] treeMap;
+	static PriorityQueue<Tree> treeQ = new PriorityQueue<>();
 	static Queue<Tree> deadQ = new LinkedList<>();
 	static Queue<Tree> breedQ = new LinkedList<>();
 	public static void main(String[] args) {
@@ -24,17 +23,14 @@ public class Main {
 		K = sc.nextInt();		//1 ≤ K ≤ 1,000
 		map = new int[N][N];
 		A = new int[N][N];
-		treeMap = new PriorityQueue[N][N];
 		
-		//가장 처음에 양분은 모든 칸에 5만큼 들어있다.
 		
 		//겨울에 추가되는 양분
 		for(int i = 0; i < N; i++) {
-			Arrays.fill(map[i], 5);
 			for(int j = 0; j < N; j++) {
 				A[i][j] = sc.nextInt();
+				//가장 처음에 양분은 모든 칸에 5만큼 들어있다.
 				map[i][j] = 5;
-				treeMap[i][j] = new PriorityQueue<>();
 			}
 			//System.out.println(Arrays.toString(map[i]));
 		}
@@ -43,9 +39,7 @@ public class Main {
 			int r = sc.nextInt() - 1;
 			int c = sc.nextInt() - 1;
 			int val = sc.nextInt();
-			Tree tree = new Tree(r, c, val);
-			treeMap[r][c].add(tree);
-//			System.out.println(tree);
+			treeQ.add(new Tree(r, c, val));
 		}
 		
 		//봄
@@ -53,43 +47,37 @@ public class Main {
 			//하나의 칸에 여러개의 나무가 있다면, 나이가 어린 나무부터 양분을 먹는다.
 			//만약, 땅에 양분이 부족해 자신의 나이만큼 양분을 먹을 수 없는 경우 즉시 죽는다.
 		for(int k = 0; k < K; k++) {
-			deadQ = new LinkedList<>();
-			breedQ = new LinkedList<>();
+			deadQ.clear();
+			breedQ.clear();
 			//봄
-			for(int i = 0; i < N; i++) {
-				for(int j = 0; j < N; j++) {
-					for(int s = 0; s < treeMap[i][j].size(); s++) {
-						Tree t = treeMap[i][j].poll();
-//						System.out.println(t);
-						if(t.age <= map[i][j]) {
-							map[i][j] -= t.age;
-							t.age++;
-							treeMap[i][j].add(t);
-							breedQ.add(t);
-						}else {
-							deadQ.add(t);
-						}
-					}
+			int sCnt = treeQ.size();
+			for(int s = 0; s < sCnt; s++) {
+				Tree t = treeQ.poll();
+				if(t.age <= map[t.r][t.c]) {
+					map[t.r][t.c] -= t.age;
+					t.age++;
+					breedQ.add(t);
+				}else {
+					deadQ.add(t);
 				}
 			}
 			
 			//여름
 			//봄에 죽은 나무가 양분으로 변함,
 			//각각은 죽은 나무마다 나이를 2로 나눈 값이 나무에 있던 칸에 양분으로 추가
-			for(int i = 0; i < deadQ.size(); i++) {
-				Tree t = deadQ.poll();
+			for(Tree t : deadQ) {
 				map[t.r][t.c] += (t.age/2);
 			}
 			
 			//가을
 			//번식하는 나무는 나이가 5의 배수이며, 인접한 8개의 칸에 나이가 1인 나무가 생긴다.
-			for(int i = 0; i < breedQ.size(); i++) {
-				Tree t = breedQ.poll();
+			for(Tree t : breedQ) {
+				treeQ.add(new Tree(t.r, t.c, t.age));
 				for(int ii = 0; ii < 8; ii++) {
 					int nr = t.r + dr[ii];
 					int nc = t.c + dc[ii];
-					if(0 <= nr && nc < N && 0 <= nc && nc < N && t.age % 5 == 0) {
-						treeMap[nr][nc].add(new Tree(nr, nc, 1));
+					if(0 <= nr && nr < N && 0 <= nc && nc < N && t.age % 5 == 0) {
+						treeQ.add(new Tree(nr, nc, 1));
 					}
 				}
 			}
@@ -100,18 +88,11 @@ public class Main {
 				for(int j = 0; j < N; j++) {
 					map[i][j] += A[i][j];
 				}
-			}
+			}			
 		}
 		
-		
-		int ans = 0;
 		//K년 지난 후 상도의 땅에 살아있는 나무의 개수
-		for(int i = 0; i < N; i++) {
-			for(int j = 0; j < N; j++) {
-				ans += treeMap[i][j].size();
-			}
-		}
-		System.out.println(ans);
+		System.out.println(treeQ.size());
 	}
 	
 	static class Tree implements Comparable<Tree>{
@@ -131,6 +112,5 @@ public class Main {
 		public int compareTo(Tree o) {
 			return this.age - o.age;
 		}
-		
 	}
 }
