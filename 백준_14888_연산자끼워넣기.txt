@@ -1,0 +1,55 @@
+import java.util.Scanner;
+
+public class Main {
+	static int N, max, min;
+	static int[] operand;
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		N = sc.nextInt();
+		operand = new int[N];
+		int[] operator = new int[4];
+		for(int i = 0; i < N; i++) {
+			operand[i] = sc.nextInt();
+		}
+		for(int i = 0; i < 4; i++) {
+			operator[i] = sc.nextInt();
+		}
+		
+		max = Integer.MIN_VALUE;
+		min = 987654321;
+		
+		dfs(1, operand[0], operator);
+		System.out.println(max);
+		System.out.print(min);
+	}
+	
+	static void dfs(int cnt, int ans, int[] operator) {
+		if(N == cnt) {
+			if(ans > max) max = ans;
+			if(ans < min) min = ans;
+			return;
+		}
+		
+		if(operator[0] > 0) {
+			operator[0]--;
+			dfs(cnt + 1, ans + operand[cnt], operator);
+			operator[0]++;
+		}
+		if(operator[1] > 0) {
+			operator[1]--;
+			dfs(cnt + 1, ans - operand[cnt], operator);
+			operator[1]++;
+		}
+		if(operator[2] > 0) {
+			operator[2]--;
+			dfs(cnt + 1, ans * operand[cnt], operator);
+			operator[2]++;
+		}
+		if(operator[3] > 0) {
+			operator[3]--;
+			dfs(cnt + 1, ans / operand[cnt], operator);
+			operator[3]++;
+		}
+		
+	}
+}
