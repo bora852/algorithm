@@ -1,0 +1,123 @@
+package algo_0318;
+
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+public class 혁셈블리어_bfs {
+	static class Job{
+		int r,c,dir,mem;
+		public Job(int r, int c, int dir, int mem) {
+			this.r = r;
+			this.c = c;
+			this.dir = dir;
+			this.mem = mem;
+		}
+	}
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int T = sc.nextInt();
+		for (int tc = 1; tc <= T; tc++) {
+			int R = sc.nextInt();
+			int C = sc.nextInt();
+			char[][] map = new char[R][C];
+			boolean canFinish = false;
+			for (int i = 0; i < R; i++) {
+				String line = sc.next();
+				// map[i] = line.toCharArray(); //이래도 되고ㅎ
+				for (int j = 0; j < C; j++) {
+					map[i][j] = line.charAt(j);
+					if (map[i][j] == '@')
+						canFinish = true;
+				}
+			}
+			boolean[][][][] visited = new boolean[R][C][4][16];
+			boolean ans = false;
+			if(canFinish) {
+				Queue<Job> queue = new LinkedList<>();
+				queue.add(new Job(0,0,3,0));//r c dir mem 0 0 0 0
+				loop:while( !queue.isEmpty() ) {
+					Job job = queue.poll();
+					if(visited[job.r][job.c][job.dir][job.mem])
+						continue;
+					visited[job.r][job.c][job.dir][job.mem] = true;
+					switch (map[job.r][job.c]) {
+					case '@':
+						//종료처리
+						ans = true;
+						break loop;
+					case '^':
+						job.dir = 0;
+						break;
+					case 'v':
+						job.dir = 1;
+						break;
+					case '<':
+						job.dir = 2;
+						break;
+					case '>':
+						job.dir = 3;
+						break;
+					case '_':
+						job.dir = (job.mem == 0 ? 3 : 2);
+						break;
+					case '|':
+						job.dir = (job.mem == 0 ? 1 : 0);
+						break;
+					case '?':
+						//사방처리
+						for(int i = 0; i < 4; i++) {
+							int nr = job.r + dr[i];
+							int nc = job.c + dc[i];
+							nr = (nr == map.length ? 0 : nr);
+							nr = (nr == -1 ? map.length-1 : nr);
+							nc = (nc == map[nr].length ? 0 : nc);
+							nc = (nc == -1 ? map[nr].length-1 : nc);
+							queue.add( new Job(nr,nc, i, job.mem));
+						}
+						continue;
+					case '.':
+						break;
+					case '+':
+						job.mem = (job.mem == 15? 0: job.mem+1);
+						break;
+					case '-':
+						job.mem = (job.mem == 0? 15: job.mem-1);
+						break;
+					default:
+						//문제에서 주어지는 모든 경우를 case문으로 만들었으므로 0-9만 이리 들어옴
+						job.mem = map[job.r][job.c] -'0';
+						break;
+					}
+					//새로운 상태의 job객체 생성해서 큐에 추가
+					int nr = job.r + dr[job.dir];
+					int nc = job.c + dc[job.dir];
+					nr = (nr == map.length ? 0 : nr);
+					nr = (nr == -1 ? map.length-1 : nr);
+					nc = (nc == map[nr].length ? 0 : nc);
+					nc = (nc == -1 ? map[nr].length-1 : nc);
+					queue.add( new Job(nr,nc, job.dir, job.mem));
+				}
+			}
+			System.out.println("#" + tc + " " + (ans?"YES":"NO"));
+		}
+	}
+	static int[] dr = { -1, 1, 0, 0 };
+	static int[] dc = { 0, 0, -1, 1 };
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
