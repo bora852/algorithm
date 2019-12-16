@@ -1,0 +1,76 @@
+package algo_0318;
+
+import java.util.Scanner;
+
+public class Main {
+	
+	
+	static int[] dr = {0, 0, 1, -1, -1, -1, 1, 1};
+	static int[] dc = {1, -1, 0, 0,  1, -1, 1, -1};
+	static String[] dir = {"R","L","B","T","RT","LT","RB","LB"};
+	static int[][] map;
+	static int N, sR, sC, kR, kC;
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		map = new int[8][8];
+		//A~H 열 시작
+		//8~1  행
+		String king = sc.next();
+		kC = (int)king.charAt(0)-'A';
+		kR = 8 - (king.charAt(1)-'0');
+		
+		String ston = sc.next();
+		sC = (int)ston.charAt(0)-'A';
+		sR = 8 - (ston.charAt(1)-'0');
+		
+		N = sc.nextInt();
+		
+		String c = "";
+		int idx = 0;
+		for(int i = 0; i < N; i++) {
+			c = sc.next();
+			idx = direct(c);
+			
+			int knr = kR + dr[idx];
+			int knc = kC + dc[idx];
+			int nsr = sR;
+			int nsc = sC;
+			
+			
+			if(knr == sR && knc == sC) {
+				nsr = sR + dr[idx];
+				nsc = sC + dc[idx];
+			}
+			
+			if(!isRange(knr, knc) || !isRange(nsr, nsc)) continue; 
+			
+			kR = knr;
+			kC = knc;
+			sR = nsr;
+			sC = nsc;
+		}
+		
+		
+		StringBuilder sb = new StringBuilder();
+//		System.out.println(kC+" "+kR+" "+sC+" "+sR+" ");
+		sb.append((char)(kC+'A'));
+		sb.append(8-kR+"\n");
+		sb.append((char)(sC+'A'));
+		sb.append(8-sR);
+		System.out.println(sb.toString());
+	}
+	
+	static boolean isRange(int r, int c) {
+		return 0 <= r && r < 8 && 0 <= c && c < 8;
+	}
+	
+	static int direct(String str) {
+		for(int i = 0; i < dir.length; i++) {
+			if(str.equals(dir[i])) {
+				return i;
+			}
+		}
+		return -1;
+	}
+}
