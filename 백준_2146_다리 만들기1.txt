@@ -1,0 +1,127 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main {
+	static int N, ans;
+	static int[][] map, label;
+	static boolean[][] visit;
+	static int[] dr = {-1, 1, 0, 0};
+	static int[] dc = {0, 0, -1, 1};
+	static ArrayList<ArrayList<int[]>> island;
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		N = sc.nextInt();
+		map = new int[N][N];
+		label = new int[N][N];
+		island = new ArrayList<>();
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				map[i][j] = sc.nextInt();
+			}
+		}
+		
+		
+		int num = 0;
+		visit = new boolean[N][N];
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++) {
+				if(map[i][j] == 1 && !visit[i][j])
+					label(i, j, ++num);
+			}
+		}
+		
+		ans = 987654321;
+		solve();
+		
+		System.out.println(ans);
+	}
+    static boolean isEdge(int x, int y) {
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dr[i];
+            int ny = y + dc[i];
+            if(!isRange(nx,ny) || map[nx][ny] != 0) continue;
+            return true;
+        }
+        return false;
+    }
+	static void solve() {
+		for(int i = 0; i < island.size(); i++) {
+			ArrayList<int[]> list = island.get(i);
+			visit = new boolean[N][N];
+			Queue<Point> q = new LinkedList<>();
+			for(int j = 0; j < list.size(); j++) {
+				int[] tmp = list.get(j);
+				if(!isEdge(tmp[0],tmp[1]))
+                    continue;
+				q.add(new Point(tmp[0],tmp[1]));
+			}
+			
+			int[] tmp = list.get(0);
+			int color = label[tmp[0]][tmp[1]];
+			loop : while(!q.isEmpty()) {
+				Point p = q.poll();
+				for(int k = 0; k < 4; k++) {
+					int nr = dr[k] + p.r;
+					int nc = dc[k] + p.c;
+					
+					if(isRange(nr, nc) && !visit[nr][nc]) {
+						if(label[nr][nc] == 0) {
+//							System.out.println(nr+" "+nc);
+							q.add(new Point(nr, nc, p.cnt + 1));
+							visit[nr][nc] = true;
+						}else if(color != label[nr][nc]) {
+							if(ans > p.cnt) {
+								ans = p.cnt;
+							}
+							break loop;
+						}
+					}
+				}
+				
+			}
+		}
+	}
+	
+	static void label(int r, int c, int num) {
+		ArrayList<int[]> list = new ArrayList<>();
+		Queue<Point> q = new LinkedList<>();
+		q.add(new Point(r, c));
+		visit[r][c] = true;
+		label[r][c] = num;
+		list.add(new int[]{r, c});
+		while(!q.isEmpty()) {
+			Point p = q.poll();
+			for(int k = 0; k < 4; k++) {
+				int nr = dr[k] + p.r;
+				int nc = dc[k] + p.c;
+				
+				if(isRange(nr, nc) && !visit[nr][nc] && map[nr][nc] == 1) {
+					visit[nr][nc] = true;
+					label[nr][nc] = num;
+					q.add(new Point(nr, nc));
+					list.add(new int[]{nr, nc});
+				}
+			}
+		}
+		island.add(list);
+	}
+	
+	static boolean isRange(int r, int c) {
+		return 0 <= r && r < N && 0 <= c && c < N;
+	}
+	
+	static class Point{
+		int r, c, cnt;
+		Point(int r, int c){
+			this.r = r;
+			this.c = c;
+		}
+		Point(int r, int c, int cnt){
+			this(r, c);
+			this.cnt = cnt;
+		}
+	}
+}
