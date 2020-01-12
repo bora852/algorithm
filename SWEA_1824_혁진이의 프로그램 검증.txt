@@ -110,74 +110,106 @@ public class 혁셈블리어_bfs {
 
 
 
+package algo_0318;
 
-
-
-
-import java.util.Arrays;
 import java.util.Scanner;
 
-public class Main {
-	
-	static int R, C, ans, MEMORY;
-	static char[][] map;
-	static boolean[][][][] visited;
-	static int[] dr = {-1, 1, 0, 0};
-	static int[] dc = {0, 0, -1, 1};
+public class 혁셈블리어_dfs {
 	
 	public static void main(String[] args) {
-		
-//		Scanner sc = new Scanner(System.in);
-		Scanner sc = new Scanner("3\r\n" + 
-				"2 6\r\n" + 
-				"6>--v.\r\n" + 
-				".^--_@\r\n" + 
-				"2 6\r\n" + 
-				"5>--v.\r\n" + 
-				".^--_@\r\n" + 
-				"2 6\r\n" + 
-				".>--v.\r\n" + 
-				".^--?@");
+		Scanner sc = new Scanner(System.in);
 		int T = sc.nextInt();
-		
 		for(int tc = 1; tc <= T; tc++) {
-			ans = 0;
-			MEMORY = 0;
-			R = sc.nextInt();
-			C = sc.nextInt();
-			map = new char[R][C];
-			visited = new boolean[R][C][10][4];
-			
+			int R = sc.nextInt();
+			int C = sc.nextInt();
+			char[][] map = new char[R][C];
+			boolean canFinish = false;
 			for(int i = 0; i < R; i++) {
-				String str = sc.next();
+				String line = sc.next();
+//				map[i] = line.toCharArray(); //이래도 되고ㅎ
 				for(int j = 0; j < C; j++) {
-					char tmp = str.charAt(j);
-					map[i][j] = tmp;
+					map[i][j] = line.charAt(j);
+					if(map[i][j] == '@')
+						canFinish = true;
 				}
-				System.out.println(Arrays.toString(map[i]));
 			}
-			
-			//switch문
-			
-			
-			System.out.println("#"+tc+" "+(ans == 0 ? "NO" : "YES"));
+			boolean[][][][] visited = new boolean[R][C][4][16];
+			ans = false;
+			if(canFinish)
+				dfs(0, 0, 3, 0, visited, map);
+			System.out.println("#" + tc + " " + (ans?"YES":"NO"));
 		}
 	}
 	
-	static void solve(int r, int c, int num, int dir) {
-		if(visited[r][c][num][dir]) return;
+	//상하좌우(0,1,2,3)
+	static int[] dr = {-1,1,0,0};
+	static int[] dc = {0,0,-1,1};
+	static boolean ans;
+	static void dfs(int r,int c, int dir, int mem, boolean[][][][] visited, char[][] map) {
+		if(visited[r][c][dir][mem])
+			return;
+		//현재 상태에 대해서 방문처리.
+		visited[r][c][dir][mem] = true;
 		
+		//문제의 규칙에 따른 노가딩
+		switch (map[r][c]) {
+		case '@':
+			//종료처리
+			ans = true;
+			return;
+		case '^':
+			dir = 0;
+			break;
+		case 'v':
+			dir = 1;
+			break;
+		case '<':
+			dir = 2;
+			break;
+		case '>':
+			dir = 3;
+			break;
+		case '_':
+			dir = (mem == 0 ? 3 : 2);
+			break;
+		case '|':
+			dir = (mem == 0 ? 1 : 0);
+			break;
+		case '?':
+			//사방처리
+			for(int i = 0; i < 4; i++) {
+				int nr = r + dr[i];
+				int nc = c + dc[i];
+				nr = (nr == map.length ? 0 : nr);
+				nr = (nr == -1 ? map.length-1 : nr);
+				nc = (nc == map[nr].length ? 0 : nc);
+				nc = (nc == -1 ? map[nr].length-1 : nc);
+				dfs(nr, nc, i, mem, visited, map);
+			}
+			return;
+		case '.':
+			break;
+		case '+':
+			mem = (mem == 15? 0: mem+1);
+			break;
+		case '-':
+			mem = (mem == 0? 15: mem-1);
+			break;
+		default:
+			//문제에서 주어지는 모든 경우를 case문으로 만들었으므로 0-9만 이리 들어옴
+			mem = map[r][c] -'0';
+			break;
+		}
 		int nr = r + dr[dir];
 		int nc = c + dc[dir];
-		switch(map[nr][nc]) {
-			
-		}
+		nr = (nr == map.length ? 0 : nr);
+		nr = (nr == -1 ? map.length-1 : nr);
+		nc = (nc == map[nr].length ? 0 : nc);
+		nc = (nc == -1 ? map[nr].length-1 : nc);
+		dfs(nr, nc, dir, mem, visited, map);
+		
 	}
 }
-
-
-
-
 
 
 
