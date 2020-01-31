@@ -1,0 +1,188 @@
+//https://www.acmicpc.net/problem/1922
+
+//PriorityQueue 사용
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.PriorityQueue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+public class Main {
+	static int N, M, ans;
+	static PriorityQueue<Edge> edges;
+	static int[] parent;
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
+		
+		N = Integer.parseInt(br.readLine());
+		M = Integer.parseInt(br.readLine());
+		ans = 0;
+		edges = new PriorityQueue<>();
+		parent = new int[N + 1];
+		
+		for(int i = 0; i < M; i++) {
+			st = new StringTokenizer(br.readLine());
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			int c = Integer.parseInt(st.nextToken());
+			edges.add(new Edge(a, b, c));
+		}
+		
+		//parent 자기 자신으로 setting
+		for(int i = 1; i <= N; i++) {
+			parent[i] = i;
+		}
+		
+		while(!edges.isEmpty()) {
+			Edge e = edges.poll();
+			if(union(e.a, e.b)) {
+				ans += e.cost;
+			}
+		}
+		
+		System.out.println(ans);
+	}
+	
+	static int findSet(int p) {
+		if(parent[p] == p) return p;
+		return parent[p] = findSet(parent[p]);
+	}
+	
+	static boolean union(int a, int b) {
+		int rootA = findSet(a);
+		int rootB = findSet(b);
+		if(rootA != rootB) {
+			parent[rootA] = rootB;
+			return true;
+		}
+		return false;
+	}
+	
+	static class Edge implements Comparable<Edge> {
+
+		int a;
+		int b;
+		int cost;
+		
+		Edge(int a, int b, int cost) {
+			this.a = a;
+			this.b = b;
+			this.cost = cost;
+		}
+		
+		@Override
+		public int compareTo(Edge o) {
+			return (o.cost >= this.cost) ? -1 : 1;
+		}
+		
+		@Override
+		public String toString() {
+			return a+" "+b+" "+cost;
+		}
+	}
+}
+
+
+// 배열 사용
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+	static int N, M, ans;
+//	static PriorityQueue<Edge> edges;
+	static Edge[] edges;
+	static int[] parent;
+	public static void main(String[] args) {
+//		Scanner sc = new Scanner(System.in);
+		Scanner sc = new Scanner("6\r\n" + 
+				"9\r\n" + 
+				"1 2 5\r\n" + 
+				"1 3 4\r\n" + 
+				"2 3 2\r\n" + 
+				"2 4 7\r\n" + 
+				"3 4 6\r\n" + 
+				"3 5 11\r\n" + 
+				"4 5 3\r\n" + 
+				"4 6 8\r\n" + 
+				"5 6 8");
+		
+		N = sc.nextInt();
+		M = sc.nextInt();
+		ans = 0;
+//		edges = new PriorityQueue<>();
+		edges = new Edge[M];
+		parent = new int[N + 1];
+		
+		for(int i = 0; i < M; i++) {
+			int a = sc.nextInt();
+			int b = sc.nextInt();
+			int c = sc.nextInt();
+			edges[i] = new Edge(a, b, c);
+			//edges.add(new Edge(a, b, c));
+		}
+		
+		//parent 자기 자신으로 setting
+		for(int i = 1; i <= N; i++) {
+			parent[i] = i;
+		}
+		
+		Arrays.sort(edges);
+		
+		for(int i = 0; i < M; i++) {
+			Edge e = edges[i];
+			if(union(e.a, e.b)) {
+				ans += e.cost;
+			}
+		}
+		
+//		while(!edges.isEmpty()) {
+//			Edge e = edges.poll();
+//			if(union(e.a, e.b)) {
+//				ans += e.cost;
+//			}
+//		}
+		
+		System.out.println(ans);
+	}
+	
+	static int findSet(int p) {
+		if(parent[p] == p) return p;
+		return parent[p] = findSet(parent[p]);
+	}
+	
+	static boolean union(int a, int b) {
+		int rootA = findSet(a);
+		int rootB = findSet(b);
+		if(rootA != rootB) {
+			parent[rootA] = rootB;
+			return true;
+		}
+		return false;
+	}
+	
+	static class Edge implements Comparable<Edge> {
+
+		int a;
+		int b;
+		int cost;
+		
+		Edge(int a, int b, int cost) {
+			this.a = a;
+			this.b = b;
+			this.cost = cost;
+		}
+		
+		@Override
+		public int compareTo(Edge o) {
+			return (o.cost >= this.cost) ? -1 : 1;
+		}
+		
+		@Override
+		public String toString() {
+			return a+" "+b+" "+cost;
+		}
+	}
+}

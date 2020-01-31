@@ -1,0 +1,76 @@
+import java.util.Arrays;
+
+class Solution {
+    public int solution(int n, int[][] costs) {
+        int answer = 0;
+ 
+        int[] parent = new int[n];
+        Point[] points = new Point[costs.length];
+        for(int i = 0; i < costs.length; i++) {
+    		points[i] = new Point(costs[i][0], costs[i][1], costs[i][2]);
+        }
+        
+        Arrays.fill(parent, -1);
+        Arrays.sort(points);
+        
+        for(int i = 0; i < costs.length; i++) {
+        	Point p = points[i];
+        	if(union(parent, p.a, p.b)) {
+        		answer += p.c;
+        	}
+        }
+        
+        return answer;
+    }
+    
+    int find(int[] parent, int n) {
+    	if(parent[n] < 0) return n;
+    	return parent[n] = find(parent, parent[n]); 
+    }
+    
+    boolean union(int[] parent, int a, int b) {
+    	int RootA = find(parent, a);
+    	int RootB = find(parent, b);
+    	
+    	if(RootA != RootB) {
+    		parent[RootA] = RootB;
+    		return true;
+    	}
+    	return false;
+    }
+    
+    class Point implements Comparable<Point>{
+    	int a;
+    	int b;
+    	int c;
+    	
+		public Point(int a, int b, int c) {
+			super();
+			this.a = a;
+			this.b = b;
+			this.c = c;
+		}
+
+		@Override
+		public int compareTo(Point o) {
+			return (o.c >= this.c) ? -1 : 1;
+		}
+		
+		@Override
+		public String toString() {
+			return a+" "+b+" "+c;
+		}
+    }
+}
+
+
+public class Programmers {
+	public static void main(String[] args) {
+		Solution sol = new Solution();
+//		String str = "()(((()())(())()))(())";
+//		System.out.println(sol.solution(str));
+		
+		int[][] str = {{0, 1, 5}, {1, 2, 3}, {2, 3, 3}, {3, 1, 2}, {3, 0, 4}};
+		System.out.println(sol.solution(4, str));
+	}
+}
