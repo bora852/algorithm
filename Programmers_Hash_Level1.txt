@@ -1,0 +1,28 @@
+import java.util.HashMap;
+
+public class Main {
+	public static void main(String[] args) {
+		Solution sol = new Solution();
+		String[] participant = {"mislav", "stanko", "mislav", "ana"};
+		String[] completion = {"stanko", "ana", "mislav"};
+		System.out.println(sol.solution(participant, completion));
+	}
+}
+
+class Solution {
+    public String solution(String[] participant, String[] completion) {
+        HashMap<String, Integer> map = new HashMap<>();
+        
+        for(String str : completion) { 
+        	map.put(str, map.getOrDefault(str, 0) + 1);
+        }
+        
+        for(String str : participant) {
+        	map.put(str, map.getOrDefault(str, 0) - 1);
+        	
+        	if(map.get(str) < 0) return str; 
+        }
+        
+        return null;
+    }
+}
