@@ -1,0 +1,29 @@
+class Solution {
+	static int answer;
+    public int solution(int[] numbers, int target) {
+    	answer = 0;
+        dfs(0, numbers, target, 0);
+        return answer;
+    }
+    
+    void dfs(int cnt, int[] numbers, int target, int num) {
+    	if(cnt == numbers.length) {
+    		if(num == target) {
+    			answer++;
+    		}
+    		return;
+    	}
+    	
+    	dfs(cnt + 1, numbers, target, num + numbers[cnt]);
+    	dfs(cnt + 1, numbers, target, num - numbers[cnt]);
+    }
+}
+
+
+public class Programmers {
+	public static void main(String[] args) {
+		Solution sol = new Solution();
+		int[][] str = {{0, 1, 5}, {1, 2, 3}, {2, 3, 3}, {3, 1, 2}, {3, 0, 4}};
+		System.out.println(sol.solution(new int[]{1, 1, 1, 1, 1}, 3));
+	}
+}
