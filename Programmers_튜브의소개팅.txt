@@ -1,0 +1,84 @@
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+
+class Solution {
+	static int[][] dir = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+	static Long[][][] dist;
+	public int[] solution(int m, int n, int s, int[][] time_map) {
+		Long inf = Long.MAX_VALUE;
+		dist = new Long[m*n+1][m][n];
+		for(int i = 0; i < m*n+1; i++) {
+			for(int j = 0; j < m; j++) {
+				for(int k = 0; k < n; k++) {
+					dist[i][j][k] = inf;
+				}
+			}
+		}
+		
+		dfs(m, n, s, time_map);
+		
+		int[] answer = new int[2];
+		
+		for(int i = 0; i < m*n; i++) {
+			if(dist[i][m-1][n-1] > s) continue;
+			answer[0] = i;
+			answer[1] = (dist[i][m-1][n-1]).intValue();
+			break;
+		}
+
+		return answer;
+	}
+	
+	void dfs(int m, int n, int s, int[][] map) {
+
+		Queue<Point> q = new LinkedList<>();
+		q.add(new Point(0, 0, 0));
+		dist[0][0][0] = 0L;
+		
+		while(!q.isEmpty()) {
+			Point p = q.poll();
+			
+			if(dist[p.dis][p.r][p.c] > s) continue;
+			
+			for(int k = 0; k < 4; k++) {
+				int nr = p.r + dir[k][0];
+				int nc = p.c + dir[k][1];
+				int ndis = p.dis + 1;
+				
+				if(!isRange(m, n, nr, nc)) continue; 
+				if(map[nr][nc] == -1)continue;
+				if(p.dis >= n*m) continue;
+				
+				if(dist[ndis][nr][nc] > (dist[p.dis][p.r][p.c] + map[nr][nc])) {
+					dist[ndis][nr][nc] = dist[p.dis][p.r][p.c] + map[nr][nc];
+					q.add(new Point(nr, nc, ndis));
+				}
+			}
+		}
+	}
+	
+	boolean isRange(int m, int n, int r, int c) {
+		return 0 <= r && r < m && 0 <= c && c < n;
+	}
+	
+	class Point {
+		int r;
+		int c;
+		int dis;
+		
+		public Point(int r, int c, int dis) {
+			super();
+			this.r = r;
+			this.c = c;
+			this.dis = dis;
+		}
+	}
+}
+
+public class Programmers {
+	public static void main(String[] args) {
+		Solution sol = new Solution();
+		System.out.println(Arrays.toString(sol.solution(5, 5, 12, new int[][] {{0, 1, 1, 1, 1}, {9, 9, 9, 1, 9}, {1, 1, 1, 1, 9}, {1, 1, 5, 9, 9}, {1, 1, 1, 1, 0}})));
+	}
+}
