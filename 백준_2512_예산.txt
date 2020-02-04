@@ -1,0 +1,86 @@
+//https://www.acmicpc.net/problem/2512
+
+//1
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		int N = sc.nextInt();
+		int[] arr = new int[N];
+
+		for(int i = 0; i < N; i++) {
+			arr[i] = sc.nextInt();
+		}
+		Arrays.sort(arr);
+
+		int budget = sc.nextInt();
+		
+		int min = 0;
+		int max = arr[N - 1];
+		int mid = 0;
+		while(min <= max) {
+			int sum = 0;
+			mid = (max + min)/2;
+			
+			for(int i = 0; i < N; i++) {
+				sum += (mid < arr[i]) ? mid : arr[i];
+			}
+			
+			if(sum > budget) max = mid - 1;
+			else min = mid + 1;
+		}
+		System.out.println(max);
+	}
+}
+
+
+//2
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		int N = sc.nextInt();
+		int[] arr = new int[N];
+
+		Long all = 0L;
+		for(int i = 0; i < N; i++) {
+			arr[i] = sc.nextInt();
+			all += arr[i];
+		}
+		Arrays.sort(arr);
+
+		int budget = sc.nextInt();
+		
+		if(all <= budget) {
+			System.out.println(arr[N - 1]);
+		}else {
+			int min = (int) Math.floor( budget / N );
+	//		int min =  budget / N ;
+			int max = arr[N - 1];
+			int mid = 0;
+			int compareMid = 0;
+			while(true) {
+				int sum = 0;
+				mid = (int) Math.ceil((max + min)/2);
+				
+				if(mid == compareMid) break;
+				
+				for(int i = 0; i < N; i++) {
+					sum += (mid < arr[i]) ? mid : arr[i];
+				}
+				
+				if(sum > budget) max = mid;
+				else min = mid;
+				
+				compareMid = mid;
+			}
+			System.out.println(mid);
+		}
+	}
+}
