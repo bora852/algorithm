@@ -1,0 +1,134 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+	
+	static String str = "30\r\n" + 
+			"2\r\n" + 
+			"30 30 31 30 29 30 30 30\r\n" + 
+			"30 30 31 30 29 30 30 30\r\n" + 
+			"29 29 30 29 29 29 29 29\r\n" + 
+			"30 30 31 30 29 30 30 30\r\n" + 
+			"30 30 31 30 29 30 30 30\r\n" + 
+			"31 31 31 31 30 31 31 31\r\n" + 
+			"30 30 31 30 29 30 30 30\r\n" + 
+			"30 30 31 30 29 30 30 30";
+	
+	public static void main(String[] args) throws Exception{
+//		BufferedReader br = new BufferedReader(new InputStreamReader(str));
+		Scanner sc = new Scanner(str);
+//		StringTokenizer st; 
+//		st = new StringTokenizer(br.readLine());
+//		int M = Integer.parseInt(st.nextToken()); 
+		int M = sc.nextInt(); //기본 생산량 M (30<=M<=40)
+//		
+//		st = new StringTokenizer(br.readLine());
+//		int K = Integer.parseInt(st.nextToken());
+		int K = sc.nextInt();  //자동분무기의 개수 K (1<=K<=63)
+		
+		int map[][] = new int[8][8];
+		int ans[][] = new int[8][8];
+		
+		int R[] = new int[8];
+		int C[] = new int[8];
+		int spR[] = new int[8];
+		int spC[] = new int[8];
+		int newR[] = new int[8];
+		int newC[] = new int[8];
+		int cur = 0;
+		int newMap[][] = new int[8][8];
+		int pest[][] = new int[8][8];
+		
+		for(int i = 0; i < 8; i++) {
+//			st = new StringTokenizer(br.readLine(), " ");
+			for(int j = 0; j < 8; j++) {
+//				map[i][j] = Integer.parseInt(st.nextToken());
+				map[i][j] = sc.nextInt();
+				map[i][j] -= M;    	//기본생산량을 제외
+				R[i] += map[i][j];	
+				C[j] += map[i][j];
+			}
+		}
+		
+		for(int[] c : map) {
+			System.out.println(Arrays.toString(c));
+		}
+		System.out.println();
+		System.out.println(Arrays.toString(R));
+		System.out.println(Arrays.toString(C));
+		System.out.println();
+		
+		
+		//A에서 f(i,j)와 B에서 f(i,j)의 차 2로 나눈 나머지는 1
+		//+15 되거나 -15
+		for(int i = 0; i < 8; i++) {
+			for(int j = 0; j < 8; j++) {
+				cur = R[i] + C[j] - map[i][j];
+				if((Math.abs(cur) % 2) == 1) {
+					ans[i][j] = 1;
+					spR[i]++; spC[j]++;
+				}
+			}
+		}
+		
+		System.out.println("ans Map");
+		for(int[] c : ans) {
+			System.out.println(Arrays.toString(c));
+		}
+		System.out.println();
+		System.out.println(Arrays.toString(spR));
+		System.out.println(Arrays.toString(spC));
+		System.out.println();
+		
+		
+		//모든 분무기가 비료액을 뿌리는 상태
+		for(int i = 0; i < 8; i++) {
+			for(int j = 0; j < 8; j++) {
+				newMap[i][j] = spR[i] + spC[j] - ans[i][j];
+				newR[i] += newMap[i][j];
+				newC[j] += newMap[i][j];
+			}
+		}
+		
+		System.out.println("new Map");
+		for(int[] c : newMap) {
+			System.out.println(Arrays.toString(c));
+		}
+		System.out.println();
+		System.out.println(Arrays.toString(newR));
+		System.out.println(Arrays.toString(newC));
+	
+		
+//		분무기가 제초제를 뿌리는지 비료액 뿌리는지 알아내기
+//		분무기 위치를 알아냈으니, 모든 분무기가 비료액을 뿌리는 상태를 C라고 하자.
+//		C 상태에서, (i,j) 위치의 분무기가 제초제를 뿌리는 분무기로 바뀌면 칸 하나는 
+//		2만큼 감소할 것이고, f(i,j)는 30만큼 감소할 될 것이다.
+//		 따라서 (i,j)에 대해 B 상태의 f(i,j)와 C 상태의 f(i,j)의 차가 4로 나누었을 때 나머지가 2라면,
+//		 (i,j) 위치의 분무기를 제초제를 뿌리는 분무기로 판명하면 된다.
+		for(int i = 0; i < 8; i++) {
+			for(int j = 0; j < 8; j++) {
+				cur = newR[i] + newC[j] - newMap[i][j];
+//				System.out.println("cur : "+cur+" "+i+" "+j);
+//				System.out.println(R[i] + C[j] - map[i][j] - cur);
+				if(Math.abs(R[i] + C[j] - map[i][j] - cur) % 4 == 2)
+					pest[i][j] = 1;
+			}
+		}
+		
+//		System.out.println("pest");
+//		for(int[] c : pest) {
+//			System.out.println(Arrays.toString(c));
+//		}
+//		System.out.println();
+		
+		for(int i = 0; i < 8; i++) {
+			for(int j = 0; j < 8; j++) {
+				if(ans[i][j] == 1)
+					System.out.print((pest[i][j] == 1) ? "- " : "+ ");
+				else
+					System.out.print(". ");
+			}
+			System.out.println();
+		}
+	}
+}
