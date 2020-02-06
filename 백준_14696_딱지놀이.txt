@@ -1,0 +1,47 @@
+µüÁö³îÀÌimport java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+public class Main {
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
+		
+		int N = Integer.parseInt(br.readLine());
+		
+		for(int i = 0; i < N; i++) {
+			int[] A = new int[4 + 1];
+			int[] B = new int[4 + 1];
+			st = new StringTokenizer(br.readLine(), " ");
+			int cnt = Integer.parseInt(st.nextToken());
+			for(int j = 0; j < cnt; j++) {
+				int tmp = Integer.parseInt(st.nextToken());
+				A[tmp]++;
+			}
+			st = new StringTokenizer(br.readLine(), " ");
+			cnt = Integer.parseInt(st.nextToken());
+			for(int j = 0; j < cnt; j++) {
+				int tmp = Integer.parseInt(st.nextToken());
+				B[tmp]++;
+			}
+			
+			boolean chk = false;
+			for(int j = A.length - 1; j >= 0; j--) {
+				if(A[j] > B[j]) {
+					System.out.println("A");
+					chk = true;
+					break;
+				} else if(A[j] < B[j]){
+					System.out.println("B");
+					chk = true;
+					break;
+				}
+			}
+			
+			if(!chk)
+				System.out.println("D");
+			
+		}
+		
+	}
+}
